@@ -5,7 +5,7 @@ Version: 0.1.0
 Author: ashther
 Maintainer: ashther <ashther@qq.com>
 Description: provides rotate log function.
-License: WTFPL
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: 
