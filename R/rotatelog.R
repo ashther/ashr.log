@@ -17,9 +17,18 @@
 #' }
 rotatelog <- function(...) {
 
-  if (file.size(log_name) >= .config$max_bytes) {
+  if (is.null(.config$log_name)) {
+    warning("log file wasn't set already!", call. = FALSE)
+    return(invisible())
+  }
 
-    log_files_path <- dirname(.config$log_name)
+  # get dir name of log, create the dir and file it they dont exist
+  log_files_path <- dirname(.config$log_name)
+  if (!dir.exists(log_files_path)) dir.create(log_files_path)
+  if (!file.exists(.config$log_name)) file.create(.config$log_name)
+
+  if (file.size(.config$log_name) >= .config$max_bytes) {
+
     log_files <- list.files(
       log_files_path,
       pattern = paste0(basename(.config$log_name), '\\.?\\d*'),
