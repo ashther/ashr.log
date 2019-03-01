@@ -13,14 +13,30 @@
 #' @details each log file will be size of \code{max_bytes}
 #' at most, and with only \code{backou_n} log files in this log directory
 #'
-#' @importFrom  luzlogr openlog closelog printlog
-#'
 #' @export
-rotatelog <- function(log_name, msg, max_bytes = 200*1000, backup_n = 5) {
+#'
+#' @examples
+#' \dontrun{
+#' rotatelog('log/log', 'this is a test message', max_bytes = 200*1000, backup_n = 5)
+#' }
+rotatelog <- function(log_name, ..., max_bytes = 200*1000, backup_n = 5) {
+
+  if (length(log_name) > 1)
+    warning('multiple log files provided, use the frist one!')
+  max_bytes <- as.numeric(max_bytes)
+  if (is.na(max_bytes))
+    stop("the max size parameter of log file must can't be converted to numeric!")
+  backup_n <- as.integer(backup_n)
+  if (is.na(backup_n))
+    stop("the max backup log file number parameter can't be converted to integer!")
+
+  # get dir name of log, create the dir and file it they dont exist
+  log_files_path <- dirname(log_name)
+  if (!dir.exists(log_files_path)) dir.create(log_files_path)
+  if (!file.exists(log_name)) file.create(log_name)
 
   if (file.size(log_name) >= max_bytes) {
 
-    log_files_path <- dirname(log_name)
     log_files <- list.files(
       log_files_path,
       pattern = paste0(basename(log_name), '\\.?\\d*'),
@@ -56,12 +72,10 @@ rotatelog <- function(log_name, msg, max_bytes = 200*1000, backup_n = 5) {
     }
 
     # rename log file to log.1, and re-create new log file
-    closelog(FALSE)
     file.rename(log_name, paste0(log_name, '.1'))
-    openlog(log_name, append = TRUE, sink = TRUE)
-    printlog(msg)
+    printlog(log_name, ...)
 
   } else {
-    printlog(msg)
+    printlog(log_name, ...)
   }
 }
