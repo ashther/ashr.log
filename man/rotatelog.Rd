@@ -4,17 +4,10 @@
 \alias{rotatelog}
 \title{ratate log}
 \usage{
-rotatelog(log_name, ..., max_bytes = 200 * 1000, backup_n = 5)
+rotatelog(...)
 }
 \arguments{
-\item{log_name}{the main log file name, all other backup log file will be in
-the same directory}
-
 \item{...}{the message output to log file}
-
-\item{max_bytes}{the max log file size, the unit is bytes}
-
-\item{backup_n}{the max number of log files, include main log file}
 }
 \description{
 provide rotate log function
@@ -25,6 +18,6 @@ at most, and with only \code{backou_n} log files in this log directory
 }
 \examples{
 \dontrun{
-rotatelog('log/log', 'this is a test message', max_bytes = 200*1000, backup_n = 5)
+rotatelog('this is a test message')
 }
 }
