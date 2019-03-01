@@ -17,14 +17,9 @@
 #' }
 setLogName <- function(log_name, verbose = TRUE) {
   if (length(log_name) > 1) {
-    warning('multiple log files provided, use the frist one!')
+    warning('multiple log files provided, use the frist one!', call. = FALSE)
     log_name <- log_name[1]
   }
-
-  # get dir name of log, create the dir and file it they dont exist
-  log_files_path <- dirname(log_name)
-  if (!dir.exists(log_files_path)) dir.create(log_files_path)
-  if (!file.exists(log_name)) file.create(log_name)
 
   .config$log_name <- log_name
 
@@ -65,9 +60,11 @@ getLogName <- function() {
 #' setMaxBytes(100*1024)
 #' }
 setMaxBytes <- function(max_bytes, verbose = TRUE) {
+  #TODO set units
   max_bytes <- as.numeric(max_bytes)
   if (is.na(max_bytes))
-    stop("the max size parameter of log file must can't be converted to numeric!")
+    stop("the max size parameter of log file must can't be converted to numeric!",
+         call. = FALSE)
 
   .config$max_bytes <- max_bytes
 
@@ -87,6 +84,7 @@ setMaxBytes <- function(max_bytes, verbose = TRUE) {
 #' getMaxBytes()
 #' }
 getMaxBytes <- function() {
+  #TODO better format
   .config$max_bytes
 }
 
@@ -108,7 +106,8 @@ getMaxBytes <- function() {
 setBackupN <- function(backup_n, verbose = TRUE) {
   backup_n <- as.numeric(backup_n)
   if (is.na(backup_n))
-    stop("the max backup log file number parameter can't be converted to integer!")
+    stop("the max backup log file number parameter can't be converted to integer!",
+         call. = FALSE)
 
   .config$backup_n <- backup_n
 
