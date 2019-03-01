@@ -20,5 +20,10 @@ You can specify the rotating log with max file size and backup file number, for
 example, we want to limit each bakcup log file size only to 200kB, and 5 log files
 at most:
 ```r
-rotatelog('log/log', 'this is a test msg', max_bytes = 200*1000, backup_n = 5)
+setLogName('log/log')
+setMaxBytes(200*1024)
+setBackupN(5)
+
+printlog('this message will be output directly to log file')
+rotatelog('before output message to log file, the file size and backup number will be checked first')
 ```

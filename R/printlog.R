@@ -3,7 +3,6 @@
 #'
 #' @description just like `cat`, with a timestamp
 #'
-#' @param log_name log file name
 #' @param ... content to be loged, cause we use `cat` function behind the hood, you can put any
 #' R object here
 #'
@@ -11,9 +10,12 @@
 #'
 #' @examples
 #' \dontrun{
-#' printlog('log/log', 'this is a test message')
+#' printlog('this is a test message')
 #' }
-printlog <- function(log_name, ...) {
+printlog <- function(...) {
+  if (is.null(.config$log_name))
+    stop("log file wasn't set already!")
+
   ts <- paste('[', as.character(Sys.time()), ']')
-  cat(ts, ..., '\n', file = log_name, append = TRUE)
+  cat(ts, ..., '\n', file = .config$log_name, append = TRUE)
 }

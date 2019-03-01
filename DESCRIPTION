@@ -8,8 +8,6 @@ Description: provides rotate log function.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Imports: 
-    luzlogr
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 URL: https://github.com/ashther/ashr.log
 BugReports: https://github.com/ashther/ashr.log/issues
