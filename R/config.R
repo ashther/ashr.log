@@ -23,9 +23,6 @@ setLogName <- function(log_name, verbose = TRUE) {
 
   .config$log_name <- log_name
 
-  ts <- paste('[', as.character(Sys.time()), ']')
-  cat(ts, '=== log start ===', '\n', file = log_name, append = TRUE)
-
   if (verbose)
     message(sprintf('log file was set to %s', log_name))
 
