@@ -36,3 +36,38 @@ test_that('print to log file', {
 
   unlink(dirname(getLogName()), TRUE)
 })
+
+test_that('rotate log', {
+
+  log_name <- file.path(tempdir(), 'log/log')
+
+  setLogName(log_name)
+  setMaxSize(1, units = 'Kb')
+  setBackupN(3)
+  rotatelog(paste(rep(letters, 10), collapse = ''))
+  temp <- list.files(dirname(getLogName()))
+  expect_equal(length(temp), 1)
+  expect_equal(temp, 'log')
+
+  invisible(lapply(1:5, rotatelog, ... = paste(rep(letters, 10), collapse = '')))
+  temp <- list.files(dirname(getLogName()))
+  expect_equal(length(temp), 2)
+  expect_equal(temp, c('log', 'log.1'))
+
+  invisible(lapply(1:5, rotatelog, ... = paste(rep(letters, 10), collapse = '')))
+  temp <- list.files(dirname(getLogName()))
+  expect_equal(length(temp), 3)
+  expect_equal(temp, c('log', 'log.1', 'log.2'))
+
+  invisible(lapply(1:10, rotatelog, ... = paste(rep(letters, 10), collapse = '')))
+  temp <- list.files(dirname(getLogName()))
+  expect_equal(length(temp), 4)
+  expect_equal(temp, c('log', 'log.1', 'log.2', 'log.3'))
+
+  invisible(lapply(1:5, rotatelog, ... = paste(rep(letters, 10), collapse = '')))
+  temp <- list.files(dirname(getLogName()))
+  expect_equal(length(temp), 4)
+  expect_equal(temp, c('log', 'log.1', 'log.2', 'log.3'))
+
+  unlink(dirname(getLogName()), TRUE)
+})

@@ -6,7 +6,7 @@
 #'
 #' @param ... the message output to log file
 #'
-#' @details each log file will be size of \code{max_bytes}
+#' @details each log file will be size of \code{max_size}
 #' at most, and with only \code{backou_n} log files in this log directory
 #'
 #' @export
@@ -25,7 +25,7 @@ rotatelog <- function(...) {
   createIfNotExist()
   log_files_path <- dirname(.config$log_name)
 
-  if (file.size(.config$log_name) >= .config$max_bytes) {
+  if (file.size(.config$log_name) >= .config$max_size) {
 
     log_files <- list.files(
       log_files_path,

@@ -13,7 +13,7 @@ rotatelog(...)
 provide rotate log function
 }
 \details{
-each log file will be size of \code{max_bytes}
+each log file will be size of \code{max_size}
 at most, and with only \code{backou_n} log files in this log directory
 }
 \examples{
