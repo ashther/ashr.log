@@ -22,3 +22,17 @@ test_that("setting and getting", {
   setMaxSize(1, units = 'Mb')
   expect_equal(getMaxSize(), '1 Mb')
 })
+
+test_that('print to log file', {
+
+  log_name <- file.path(tempdir(), 'log/log')
+
+  setLogName(log_name)
+  printlog('this is a test plain message')
+  temp <- readLines(getLogName())
+  temp <- strsplit(temp, '\\s\\]\\s')[[1]][2]
+  temp <- trimws(temp)
+  expect_equal(temp, 'this is a test plain message')
+
+  unlink(dirname(getLogName()), TRUE)
+})

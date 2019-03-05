@@ -22,10 +22,8 @@ rotatelog <- function(...) {
     return(invisible())
   }
 
-  # get dir name of log, create the dir and file it they dont exist
+  createIfNotExist()
   log_files_path <- dirname(.config$log_name)
-  if (!dir.exists(log_files_path)) dir.create(log_files_path)
-  if (!file.exists(.config$log_name)) file.create(.config$log_name)
 
   if (file.size(.config$log_name) >= .config$max_bytes) {
 
