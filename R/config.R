@@ -44,10 +44,11 @@ getLogName <- function() {
 
 #' @title set log file size
 #'
-#' @description if the log file size is larger than `max_bytes`, it will be rename like log.1,
+#' @description if the log file size is larger than `max_sizes`, it will be rename like log.1,
 #' and the log message will be output to new log
 #'
-#' @param max_bytes the max file size in bytes
+#' @param max_size the max file size in bytes
+#' @param units the max size units, should be one of `Kb`, `b`, `Mb`, `Gb`, `Tb`, `Pb`
 #' @param verbose if print success message
 #'
 #' @export
@@ -56,17 +57,30 @@ getLogName <- function() {
 #' \dontrun{
 #' setMaxBytes(100*1024)
 #' }
-setMaxBytes <- function(max_bytes, verbose = TRUE) {
-  #TODO set units
-  max_bytes <- as.numeric(max_bytes)
-  if (is.na(max_bytes))
+setMaxSize <- function(max_size, units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
+                       verbose = TRUE) {
+
+  units <- match.arg(units)
+  max_size <- as.numeric(max_size)
+  if (is.na(max_size))
     stop("the max size parameter of log file must can't be converted to numeric!",
          call. = FALSE)
 
-  .config$max_bytes <- max_bytes
+  units <- switch(
+    units,
+    Kb = 1024,
+    b = 1,
+    Mb = 1024^2,
+    Gb = 1024^3,
+    Tb = 1024^4,
+    Pb = 1024^5
+  )
+  .config$max_size <- max_size * units
 
   if (verbose)
-    message(sprintf('the max size of log file was set to %s bytes', max_bytes))
+    message(sprintf(
+      'the max size of log file was set to %s', getMaxSize()
+    ))
 
   invisible(TRUE)
 }
@@ -80,9 +94,8 @@ setMaxBytes <- function(max_bytes, verbose = TRUE) {
 #' \dontrun{
 #' getMaxBytes()
 #' }
-getMaxBytes <- function() {
-  #TODO better format
-  .config$max_bytes
+getMaxSize <- function() {
+  utils:::format.object_size(.config$max_size, 'auto')
 }
 
 #' @title set log file backup number

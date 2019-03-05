@@ -2,9 +2,9 @@
 
 export(getBackupN)
 export(getLogName)
-export(getMaxBytes)
+export(getMaxSize)
 export(printlog)
 export(rotatelog)
 export(setBackupN)
 export(setLogName)
-export(setMaxBytes)
+export(setMaxSize)
