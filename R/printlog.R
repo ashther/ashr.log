@@ -5,7 +5,7 @@ createIfNotExist <- function() {
   log_name <- getLogName()
 
   log_files_path <- dirname(log_name)
-  if (!dir.exists(log_files_path)) dir.create(log_files_path)
+  if (!dir.exists(log_files_path)) dir.create(log_files_path, recursive = TRUE)
   if (!file.exists(log_name)) file.create(log_name)
 
   if (!isOpenCon())
