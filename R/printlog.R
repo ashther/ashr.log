@@ -28,6 +28,9 @@ printlog <- function(...) {
     return(invisible())
   }
 
+  # TODO maybe log file was removed after setLogName, so we check it exist-status
+  # maybe we should put the create-new-connectin function in createIfNotExist?
+  # and add a onfiguration in .config like .config$log_conn, and use it in cat
   createIfNotExist()
 
   ts <- paste('[', as.character(Sys.time()), ']')

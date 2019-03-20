@@ -22,6 +22,9 @@ setLogName <- function(log_name, verbose = TRUE) {
   }
 
   .config$log_name <- log_name
+  createIfNotExist()
+  # TODO if it already exist, we should check .config$log_conn status,
+  # and open it if it is closed
 
   if (verbose)
     message(sprintf('log file was set to %s', log_name))
