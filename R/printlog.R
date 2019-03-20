@@ -2,9 +2,14 @@
 #' @title create diretory or/and file if log file path doesn't exits
 createIfNotExist <- function() {
   # get dir name of log, create the dir and file it they dont exist
-  log_files_path <- dirname(.config$log_name)
+  log_name <- getLogName()
+
+  log_files_path <- dirname(log_name)
   if (!dir.exists(log_files_path)) dir.create(log_files_path)
-  if (!file.exists(.config$log_name)) file.create(.config$log_name)
+  if (!file.exists(log_name)) file.create(log_name)
+
+  if (!isOpenCon())
+    .config$log_con <- file(log_name, open = 'a')
 
   invisible(TRUE)
 }
@@ -23,16 +28,14 @@ createIfNotExist <- function() {
 #' printlog('this is a test message')
 #' }
 printlog <- function(...) {
-  if (is.null(.config$log_name)) {
-    warning("log file wasn't set already!", call. = FALSE)
-    return(invisible())
+  if (!isOpenCon()) {
+    if (is.null(getLogName())) {
+      warning("log file connection wasn't opened!", call. = FALSE)
+      return(invisible())
+    }
+    createIfNotExist()
   }
 
-  # TODO maybe log file was removed after setLogName, so we check it exist-status
-  # maybe we should put the create-new-connectin function in createIfNotExist?
-  # and add a onfiguration in .config like .config$log_conn, and use it in cat
-  createIfNotExist()
-
   ts <- paste('[', as.character(Sys.time()), ']')
-  cat(ts, ..., '\n', file = .config$log_name, append = TRUE)
+  cat(ts, ..., '\n', file = getLogCon(), append = TRUE)
 }

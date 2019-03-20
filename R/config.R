@@ -23,8 +23,6 @@ setLogName <- function(log_name, verbose = TRUE) {
 
   .config$log_name <- log_name
   createIfNotExist()
-  # TODO if it already exist, we should check .config$log_conn status,
-  # and open it if it is closed
 
   if (verbose)
     message(sprintf('log file was set to %s', log_name))
@@ -43,6 +41,49 @@ setLogName <- function(log_name, verbose = TRUE) {
 #' }
 getLogName <- function() {
   .config$log_name
+}
+
+#' @title get log file connection
+getLogCon <- function() {
+  .config$log_con
+}
+
+#' @title check if the file connection is opened
+isOpenCon <- function() {
+  con <- getLogCon()
+
+  if (is.null(con))
+    return(FALSE)
+
+  suppressWarnings(
+    !'try-error' %in% class(try(isOpen(con), silent = TRUE))
+  )
+}
+
+#' close log file connection
+#'
+#' @param verbose if print success message
+#'
+#' @export
+#'
+#' @examples
+#' \dontrun{
+#' closeLog()
+#' }
+closeLog <- function(verbose = TRUE) {
+  if (is.null(getLogName())) {
+    warning("log file wasn't set already!", call. = FALSE)
+    return(invisible())
+  }
+
+  if (isOpenCon()) {
+    close(getLogCon())
+    if (verbose)
+      message('log file connection closed.')
+    return(invisible(TRUE))
+  }
+
+  warning('log file connection is not opened!', call. = FALSE)
 }
 
 #' @title set log file size
