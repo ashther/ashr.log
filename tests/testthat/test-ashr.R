@@ -3,9 +3,9 @@ context("test-ashr")
 test_that("setting and getting", {
   print('setting')
 
-  setLogName('log/test')
+  openlog('log/test')
   expect_equal(getLogName(), 'log/test')
-  closeLog()
+  closelog()
   unlink('log', TRUE)
 
   setBackupN(6)
@@ -32,14 +32,14 @@ test_that('print to log file', {
 
   log_name <- file.path(tempdir(), 'log/log')
 
-  setLogName(log_name)
+  openlog(log_name)
   printlog('this is a test plain message')
   temp <- readLines(getLogName())
   temp <- strsplit(temp, '\\s\\]\\s')[[1]][2]
   temp <- trimws(temp)
   expect_equal(temp, 'this is a test plain message')
 
-  closeLog()
+  closelog()
   unlink(dirname(getLogName()), TRUE)
 })
 
@@ -48,7 +48,7 @@ test_that('rotate log', {
 
   log_name <- file.path(tempdir(), 'log/log')
 
-  setLogName(log_name)
+  openlog(log_name)
   setMaxSize(1, units = 'Kb')
   setBackupN(3)
   rotatelog(paste(rep(letters, 10), collapse = ''))
@@ -76,6 +76,6 @@ test_that('rotate log', {
   expect_equal(length(temp), 4)
   expect_equal(temp, c('log', 'log.1', 'log.2', 'log.3'))
 
-  closeLog()
+  closelog()
   unlink(dirname(getLogName()), TRUE)
 })

@@ -2,9 +2,10 @@
 # configuration enviorment for log file path, max_bytes, backup_n, etc...
 .config <- new.env(parent = emptyenv())
 
-#' @title set log file name
+#' @title set log file
 #'
 #' @description set log file name, if the file or directory doesn't exist, it will be created
+#'  and open file connection
 #'
 #' @param log_name log file name
 #' @param verbose if print success message
@@ -13,9 +14,9 @@
 #'
 #' @examples
 #' \dontrun{
-#' setLogName('log/log')
+#' openlog('log/log')
 #' }
-setLogName <- function(log_name, verbose = TRUE) {
+openlog <- function(log_name, verbose = TRUE) {
   if (length(log_name) > 1) {
     warning('multiple log files provided, use the frist one!', call. = FALSE)
     log_name <- log_name[1]
@@ -60,7 +61,7 @@ isOpenCon <- function() {
   )
 }
 
-#' close log file connection
+#' @title close log file connection
 #'
 #' @param verbose if print success message
 #'
@@ -68,9 +69,9 @@ isOpenCon <- function() {
 #'
 #' @examples
 #' \dontrun{
-#' closeLog()
+#' closelog()
 #' }
-closeLog <- function(verbose = TRUE) {
+closelog <- function(verbose = TRUE) {
   if (is.null(getLogName())) {
     warning("log file wasn't set already!", call. = FALSE)
     return(invisible())
@@ -166,7 +167,7 @@ setBackupN <- function(backup_n, verbose = TRUE) {
   .config$backup_n <- backup_n
 
   if (verbose)
-    message(sprintf('the number of backup log file was set to %s bytes', backup_n))
+    message(sprintf('the number of backup log file was set to %s', backup_n))
 
   invisible(TRUE)
 }

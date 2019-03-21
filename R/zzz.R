@@ -9,7 +9,7 @@
     system.file("DESCRIPTION", package = pkgname), fields = "Version"
   )
   msg <- sprintf(
-    "max size: %s \nbackup: %s", getMaxSize(), .config$backup_n
+    "max size: %s \nbackup: %s", getMaxSize(), getBackupN()
   )
   packageStartupMessage(msg)
 }
