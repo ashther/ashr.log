@@ -2,11 +2,11 @@ context("test-ashr")
 
 test_that("setting and getting", {
 
-  log_name <- 'log/log'
+  log_name <- file.path(tempdir(), 'log/log')
   openlog(log_name)
   expect_equal(getLogName(), log_name)
 
-  expect_false(suppressWarnings(file.remove(log_name)))
+  expect_false(file.remove(log_name))
 
   closelog()
   unlink(dirname(getLogName()), TRUE)
@@ -32,7 +32,7 @@ test_that("setting and getting", {
 
 test_that('print to log file', {
 
-  log_name <- 'log/log'
+  log_name <- file.path(tempdir(), 'log/log')
 
   openlog(log_name)
   printlog('this is a test plain message')
@@ -47,7 +47,7 @@ test_that('print to log file', {
 
 test_that('rotate log', {
 
-  log_name <- 'log/log'
+  log_name <- file.path(tempdir(), 'log/log')
 
   openlog(log_name)
   setMaxSize(1, units = 'Kb')
@@ -84,7 +84,7 @@ test_that('rotate log', {
 test_that('daily log', {
   msg_test <- 'write message to an old log file'
 
-  log_name <- 'log/log'
+  log_name <- file.path(tempdir(), 'log/log')
   openlog(log_name)
 
   dailylog(msg_test)
