@@ -24,7 +24,7 @@ dailylog <- function(...) {
 
   createIfNotExist()
 
-  day_log_create <- as.Date(file.info(log_name)[1, 'ctime'])
+  day_log_create <- as.Date(file.info(log_name)[1, 'ctime'], tz = 'Asia/Shanghai')
   # this log is not created today
   if (day_log_create != Sys.Date()) {
 
@@ -44,7 +44,7 @@ dailylog <- function(...) {
     )
     if (length(log_files) > getBackupN()) {
       n_delete <- length(log_files) - getBackupN()
-      log_files <- sort(log_files, decreasing = TRUE)
+      log_files <- sort(log_files)
       file.remove(log_files[seq_len(n_delete)])
     }
 
