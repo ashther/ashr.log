@@ -9,7 +9,8 @@
     system.file("DESCRIPTION", package = pkgname), fields = "Version"
   )
   msg <- sprintf(
-    "max size: %s \nbackup: %s", getMaxSize(), getBackupN()
+    "=== WITH GREAT LOG, COMES WITH GREAT TRASH ===\nmax size: %s \nbackup: %s",
+    getMaxSize(), getBackupN()
   )
   packageStartupMessage(msg)
 }
