@@ -96,11 +96,14 @@ test_that('daily log', {
   temp <- trimws(temp)
   expect_equal(temp, msg_test)
 
-  if (Sys.info()['sysname'] == 'Windows') {
-    res <- system(sprintf(
-      "powershell -command (Get-ChildItem %s).CreationTime = '06/22/1986 12:42AM'",
-      log_name
-    ), intern = TRUE)
+  os_test <- Sys.info()['sysname']
+  if (os_test %in% c('Windows', 'Linux')) {
+    if (os_test == 'Windows')
+      cmd <- "powershell -command (Get-ChildItem %s).LastWriteTime = '06/22/1986 12:42AM'"
+    else
+      cmd <- 'touch -d "1986-06-22 00:42:00" %s'
+
+    res <- system(sprintf(cmd, log_name), intern = TRUE)
     expect_equal(res, character(0))
 
     dailylog(msg_test)

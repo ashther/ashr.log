@@ -6,7 +6,7 @@
 #' @param ... the message output to log file
 #'
 #' @details expecpt the main log file, other log file will be named with its
-#' create day, like `log.2000-01-01`, and with only \code{backou_n} log files in this log directory
+#' last modify day, like `log.2000-01-01`, and with only \code{backou_n} log files in this log directory
 #'
 #' @export
 #'
@@ -24,13 +24,13 @@ dailylog <- function(...) {
 
   createIfNotExist()
 
-  day_log_create <- as.Date(file.info(log_name)[1, 'ctime'], tz = Sys.timezone())
-  # this log is not created today
-  if (day_log_create != Sys.Date()) {
+  day_last_modify <- as.Date(file.info(log_name)$mtime, tz = Sys.timezone())
+  # this last modify day of this file is not today
+  if (day_last_modify != Sys.Date()) {
 
     # rename this log to its create-day, and open new one
     closelog(FALSE)
-    file.rename(log_name, paste(log_name, day_log_create, sep = '.'))
+    file.rename(log_name, paste(log_name, day_last_modify, sep = '.'))
     printlog(...)
 
   } else {
