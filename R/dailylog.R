@@ -24,7 +24,7 @@ dailylog <- function(...) {
 
   createIfNotExist()
 
-  day_log_create <- as.Date(file.info(log_name)[1, 'ctime'], tz = 'Asia/Shanghai')
+  day_log_create <- as.Date(file.info(log_name)[1, 'ctime'], tz = Sys.timezone())
   # this log is not created today
   if (day_log_create != Sys.Date()) {
 
