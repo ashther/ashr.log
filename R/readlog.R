@@ -87,6 +87,8 @@ readlog <- function(.time = 'today', .json = TRUE) {
     res_temp <- readSingleLog(log_files[i], .json = .json)
     res <- rbind(res, res_temp)
 
+    # TODO it should be min(res$timestamp) < time_limit, and make this
+    # in res_temp would be fine
     if (res$timestamp > time_limit | i >= length(log_files))
       break()
 
