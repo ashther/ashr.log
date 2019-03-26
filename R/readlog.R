@@ -55,15 +55,28 @@ periodToTime <- function(time_string) {
   stop('invalid log read time limit format!', call. = TRUE)
 }
 
-readSingleLog <- function(log_file, .json) {
+readSingleLog <- function(log_file) {
+  x <- readLines(log_file)
+  x <- strsplit(x, '^\\[\\s*|\\s*]\\s+')
 
+  do.call(rbind, lapply(x, function(y) {
+    tibble(timestamp = as.POSIXct(y[2]), log = y[3])
+  }))
+}
+
+fromJSONlog <- function(log_df) {
+  log_temp <- lapply(log_df$log, jsonlite::fromJSON)
+  log_temp <- dplyr::bind_rows(log_temp)
+  as_tibble(
+    cbind(log_df[, 'timestamp', drop = FALSE], log_temp)
+  )
 }
 
 readlog <- function(.time = 'today', .json = TRUE) {
   stopifnot(is.character(.time))
   stopifnot(is.logical(.json))
 
-  time_limit <- period_to_time(.time)
+  time_limit <- periodToTime(.time)
   log_name <- getLogName()
   log_files_path <- dirname(log_name)
   log_files <- list.files(
@@ -84,16 +97,20 @@ readlog <- function(.time = 'today', .json = TRUE) {
   i <- 1
   res <- tibble()
   while (TRUE) {
-    res_temp <- readSingleLog(log_files[i], .json = .json)
+    res_temp <- readSingleLog(log_files[i])
     res <- rbind(res, res_temp)
 
     # TODO it should be min(res$timestamp) < time_limit, and make this
     # in res_temp would be fine
-    if (res$timestamp > time_limit | i >= length(log_files))
+    if (min(res_temp$timestamp) < time_limit | i >= length(log_files))
       break()
 
     i <- i + 1
   }
+  res <- res[res$timestamp >= time_limit, ]
 
-  res
+  if (.json)
+    res <- fromJSONLog(res)
+
+  res[order(res$timestamp, decreasing = TRUE), , drop = FALSE]
 }
