@@ -28,6 +28,10 @@ createIfNotExist <- function() {
 #' printlog('this is a test message')
 #' }
 printlog <- function(...) {
+
+  # TODO add log level error info debug
+  # TODO make log message as json string
+
   if (!isOpenCon()) {
     if (is.null(getLogName())) {
       warning("log file connection wasn't opened!", call. = FALSE)
