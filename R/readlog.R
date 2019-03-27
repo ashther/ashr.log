@@ -59,23 +59,44 @@ readSingleLog <- function(log_file) {
   x <- readLines(log_file)
   x <- strsplit(x, '^\\[\\s*|\\s*]\\s+')
 
+  if (length(x) == 0)
+    return(tibble(timestamp = as.POSIXct(NA), log = character(0)))
+
   do.call(rbind, lapply(x, function(y) {
     tibble(timestamp = as.POSIXct(y[2]), log = y[3])
   }))
 }
 
-fromJSONlog <- function(log_df) {
-  log_temp <- lapply(log_df$log, jsonlite::fromJSON)
-  log_temp <- dplyr::bind_rows(log_temp)
+fromJSONLog <- function(log_df) {
+  log_temp <- lapply(log_df$log, fromJSON)
+  log_temp <- bind_rows(log_temp)
   as_tibble(
     cbind(log_df[, 'timestamp', drop = FALSE], log_temp)
   )
 }
 
-readlog <- function(.time = 'today', .json = TRUE) {
+#' @title read log files
+#'
+#' @description read log files, and convert to data frame
+#'
+#' @param .time the min timestamp in log files
+#' @param as_json if convert log column to multiple columns
+#'
+#' @return log data frame
+#' @export
+#'
+#' @importFrom dplyr bind_rows tibble as_tibble
+#' @importFrom jsonlite fromJSON
+#'
+#' @examples
+#' \dontrun{
+#' readlog('today', TRUE)
+#' }
+readlog <- function(.time = 'today', as_json = TRUE) {
   stopifnot(is.character(.time))
-  stopifnot(is.logical(.json))
+  stopifnot(is.logical(as_json))
 
+  # got all log files in the log directory, including rotate log and daily log
   time_limit <- periodToTime(.time)
   log_name <- getLogName()
   log_files_path <- dirname(log_name)
@@ -94,22 +115,26 @@ readlog <- function(.time = 'today', .json = TRUE) {
     return(tibble(timestamp = as.POSIXct(NA), log = character(0)))
   }
 
+  # loop log files, rbind one by one, until
+  # 1. run out all of log files
+  # 2. current log file's min timestamp is samller than time limit, cause the
+  # timestamp is older when log files are older, no need to read older log files
   i <- 1
   res <- tibble()
   while (TRUE) {
     res_temp <- readSingleLog(log_files[i])
     res <- rbind(res, res_temp)
 
-    # TODO it should be min(res$timestamp) < time_limit, and make this
-    # in res_temp would be fine
-    if (min(res_temp$timestamp) < time_limit | i >= length(log_files))
+    if (i >= length(log_files) |
+        (nrow(res_temp) > 0 & min(res$timestamp, na.rm = TRUE) < time_limit))
       break()
 
     i <- i + 1
   }
-  res <- res[res$timestamp >= time_limit, ]
+  res <- res[res$timestamp >= time_limit, , drop = FALSE]
 
-  if (.json)
+  # convert log column to multiple columns
+  if (as_json)
     res <- fromJSONLog(res)
 
   res[order(res$timestamp, decreasing = TRUE), , drop = FALSE]
