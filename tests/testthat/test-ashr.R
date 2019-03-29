@@ -136,10 +136,10 @@ test_that('read log', {
   invisible(lapply(1:10, function(x) {
     rotatelog(jsonlite::toJSON(list(y = paste0(1:10, collapse = '')), auto_unbox = TRUE))
   }))
-  temp <- readlog(as_json = FALSE)
+  temp <- readlog('1 day', as_json = FALSE)
   expect_is(temp, 'tbl_df')
   expect_equal(colnames(temp), c('timestamp', 'log'))
-  temp <- readlog(as_json = TRUE)
+  temp <- readlog('1 day', as_json = TRUE)
   expect_is(temp, 'tbl_df')
   expect_equal(colnames(temp), c('timestamp', 'y', 'x'))
 
