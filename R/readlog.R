@@ -60,17 +60,17 @@ readSingleLog <- function(log_file) {
   x <- strsplit(x, '^\\[\\s*|\\s*]\\s+')
 
   if (length(x) == 0)
-    return(tibble(timestamp = as.POSIXct(NA), log = character(0)))
+    return(dplyr::tibble(timestamp = as.POSIXct(NA), log = character(0)))
 
   do.call(rbind, lapply(x, function(y) {
-    tibble(timestamp = as.POSIXct(y[2]), log = y[3])
+    dplyr::tibble(timestamp = as.POSIXct(y[2]), log = y[3])
   }))
 }
 
 fromJSONLog <- function(log_df) {
-  log_temp <- lapply(log_df$log, fromJSON)
-  log_temp <- bind_rows(log_temp)
-  as_tibble(
+  log_temp <- lapply(log_df$log, jsonlite::fromJSON)
+  log_temp <- dplyr::bind_rows(log_temp)
+  dplyr::as_tibble(
     cbind(log_df[, 'timestamp', drop = FALSE], log_temp)
   )
 }
@@ -84,9 +84,6 @@ fromJSONLog <- function(log_df) {
 #'
 #' @return log data frame
 #' @export
-#'
-#' @importFrom dplyr bind_rows tibble as_tibble
-#' @importFrom jsonlite fromJSON
 #'
 #' @examples
 #' \dontrun{
@@ -103,6 +100,10 @@ readlog <- function(.time = 'today', as_json = TRUE) {
   log_files <- list.files(
     log_files_path,
     pattern = paste0(
+      # pattern match:
+      # 1. log
+      # 2. log.1
+      # 3. log.2000-01-01
       '^', basename(log_name), c('$', '\\.\\d+$', '\\.\\d{4}-\\d{2}-\\d{2}$'),
       collapse = '|'
     ),
@@ -112,7 +113,7 @@ readlog <- function(.time = 'today', as_json = TRUE) {
 
   if (length(log_files) == 0) {
     warning('no log files to read!')
-    return(tibble(timestamp = as.POSIXct(NA), log = character(0)))
+    return(dplyr::tibble(timestamp = as.POSIXct(NA), log = character(0)))
   }
 
   # loop log files, rbind one by one, until
@@ -120,7 +121,7 @@ readlog <- function(.time = 'today', as_json = TRUE) {
   # 2. current log file's min timestamp is samller than time limit, cause the
   # timestamp is older when log files are older, no need to read older log files
   i <- 1
-  res <- tibble()
+  res <- dplyr::tibble()
   while (TRUE) {
     res_temp <- readSingleLog(log_files[i])
     res <- rbind(res, res_temp)
