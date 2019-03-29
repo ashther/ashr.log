@@ -124,3 +124,25 @@ test_that('daily log', {
   closelog()
   unlink(dirname(getLogName()), TRUE)
 })
+
+test_that('read log', {
+
+  log_name <- file.path(tempdir(), 'log/log')
+  openlog(log_name)
+  setMaxSize(10, 'b')
+  setBackupN(5)
+
+  rotatelog(jsonlite::toJSON(list(x = paste0(letters, collapse = '')), auto_unbox = TRUE))
+  invisible(lapply(1:10, function(x) {
+    rotatelog(jsonlite::toJSON(list(y = paste0(1:10, collapse = '')), auto_unbox = TRUE))
+  }))
+  temp <- readlog(as_json = FALSE)
+  expect_is(temp, 'tbl_df')
+  expect_equal(colnames(temp), c('timestamp', 'log'))
+  temp <- readlog(as_json = TRUE)
+  expect_is(temp, 'tbl_df')
+  expect_equal(colnames(temp), c('timestamp', 'y', 'x'))
+
+  closelog()
+  unlink(dirname(getLogName()), TRUE)
+})
