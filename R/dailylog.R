@@ -14,7 +14,7 @@
 #' \dontrun{
 #' dailylog('this is a test message')
 #' }
-dailylog <- function(...) {
+dailylog <- function(..., .level = 0) {
 
   log_name <- getLogName()
   if (is.null(log_name)) {
@@ -31,11 +31,11 @@ dailylog <- function(...) {
     # rename this log to its create-day, and open new one
     closelog(FALSE)
     file.rename(log_name, paste(log_name, day_last_modify, sep = '.'))
-    printlog(...)
+    printlog(..., .level = .level)
 
   } else {
     # well, this log is today's log, go ahead
-    printlog(...)
+    printlog(..., .level = .level)
   }
 
   # 1. list all log file under this directory

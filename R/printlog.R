@@ -20,6 +20,7 @@ createIfNotExist <- function() {
 #'
 #' @param ... content to be loged, cause we use `cat` function behind the hood, you can put any
 #' R object here
+#' @param .level the log message level
 #'
 #' @export
 #'
@@ -27,7 +28,10 @@ createIfNotExist <- function() {
 #' \dontrun{
 #' printlog('this is a test message')
 #' }
-printlog <- function(...) {
+printlog <- function(..., .level = 0) {
+
+  if (.level > .config$log_level)
+    return(invisible())
 
   if (!isOpenCon()) {
     if (is.null(getLogName())) {

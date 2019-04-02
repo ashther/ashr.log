@@ -5,6 +5,7 @@
 #' @description provide rotate log function
 #'
 #' @param ... the message output to log file
+#' @param .level the log message level
 #'
 #' @details each log file will be size of \code{max_size}
 #' at most, and with only \code{backou_n} log files in this log directory
@@ -15,7 +16,7 @@
 #' \dontrun{
 #' rotatelog('this is a test message')
 #' }
-rotatelog <- function(...) {
+rotatelog <- function(..., .level = 0) {
 
   if (is.null(.config$log_name)) {
     warning("log file wasn't set already!", call. = FALSE)
@@ -64,9 +65,9 @@ rotatelog <- function(...) {
     # rename log file to log.1, and re-create new log file
     closelog(FALSE)
     file.rename(.config$log_name, paste0(.config$log_name, '.1'))
-    printlog(...)
+    printlog(..., .level = .level)
 
   } else {
-    printlog(...)
+    printlog(..., .level = .level)
   }
 }
