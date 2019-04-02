@@ -44,18 +44,14 @@ openlog <- function(log_name, log_level = INFO,
 
   .config$log_level <- log_level
   .config$rotate <- rotate
-  .config$max_size <- setMaxSize(max_size, units, FALSE)
-  .config$backup_n <- setBackupN(backup_n, FALSE)
+  setMaxSize(max_size, units, FALSE)
+  setBackupN(backup_n, FALSE)
   .config$as_json <- as_json
 
   if (verbose)
     message(sprintf(
-      'log file was set to %s, \n
-      log level is %s, \n
-      rotate type is %s, \n
-      backup number is %s, \n
-      convert inpu to json is %s',
-      log_name, names(log_level), rotate, backup_n, as_json
+      'log file was set to %s, \nlog level is %s, \nrotate type is %s, \nmax size is %s, \nbackup number is %s, \nconvert input to json is %s',
+      getLogName(), getLogLevel(), rotate, getMaxSize(), getBackupN(), as_json
     ))
 
   invisible(TRUE)
@@ -202,5 +198,7 @@ getLogLevel <- function() {
 #' @examples
 getLogInfo <- function() {
   res <- as.list(.config)
-  modifyList(res, list(log_level = getLogLevel(), max_size = getMaxSize()))
+  modifyList(res, list(log_level = getLogLevel(),
+                       log_con = isOpenCon(),
+                       max_size = getMaxSize()))
 }
