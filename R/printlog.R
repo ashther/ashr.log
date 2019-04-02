@@ -29,12 +29,6 @@ createIfNotExist <- function() {
 #' }
 printlog <- function(...) {
 
-  # TODO add log level error info debug
-  # TODO make log message as json string
-  # TODO use openlog instead of setMaxSize setBackupN
-  # TODO use printlog instead of rotatelog dailylog, set rotate type in openlog
-  # TODO use infolog instead of getLogName getMaxSize getBackupN
-
   if (!isOpenCon()) {
     if (is.null(getLogName())) {
       warning("log file connection wasn't opened!", call. = FALSE)

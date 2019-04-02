@@ -27,3 +27,10 @@ setBackupN(5)
 printlog('this message will be output directly to log file')
 rotatelog('before output message to log file, the file size and backup number will be checked first')
 ```
+
+## TODO
+- add log level error info debug
+- make log message as json string
+- use openlog instead of setMaxSize setBackupN
+- use printlog instead of rotatelog dailylog, set rotate type in openlog
+- use infolog instead of getLogName getMaxSize getBackupN
