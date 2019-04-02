@@ -8,6 +8,12 @@
 #'  and open file connection
 #'
 #' @param log_name log file name
+#' @param log_level `ERROR`, `INFO` or `DEBUG`, constant in this package
+#' @param rotate `size` or `daily`, the type of rotate log
+#' @param max_size the max file size in bytes
+#' @param units the max size units, should be one of `Kb`, `b`, `Mb`, `Gb`, `Tb`, `Pb`
+#' @param backup_n the backup log files number, must be non-negative
+#' @param as_json if all log input will be convert to json, default is true
 #' @param verbose if print success message
 #'
 #' @export
@@ -16,7 +22,18 @@
 #' \dontrun{
 #' openlog('log/log')
 #' }
-openlog <- function(log_name, verbose = TRUE) {
+openlog <- function(log_name, log_level = INFO,
+                    rotate = c('size', 'daily'), max_size = 100, backup_n = 5L,
+                    units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
+                    as_json = TRUE, verbose = FALSE) {
+  rotate <- match.arg(rotate)
+  # log_level <- as.numeric(log_level)
+  # if (is.na(log_level)) stop('log_level must be numeric!')
+  as_json <- as.logical(as_json)
+  if (is.na(as_json)) stop('as_json must be logical!')
+  verbose <- as.logical(verbose)
+  if (is.na(verbose)) stop('verbose must be logical!')
+
   if (length(log_name) > 1) {
     warning('multiple log files provided, use the frist one!', call. = FALSE)
     log_name <- log_name[1]
@@ -25,31 +42,26 @@ openlog <- function(log_name, verbose = TRUE) {
   .config$log_name <- log_name
   createIfNotExist()
 
+  .config$log_level <- log_level
+  .config$rotate <- rotate
+  .config$max_size <- setMaxSize(max_size, units, FALSE)
+  .config$backup_n <- setBackupN(backup_n, FALSE)
+  .config$as_json <- as_json
+
   if (verbose)
-    message(sprintf('log file was set to %s', log_name))
+    message(sprintf(
+      'log file was set to %s, \n
+      log level is %s, \n
+      rotate type is %s, \n
+      backup number is %s, \n
+      convert inpu to json is %s',
+      log_name, names(log_level), rotate, backup_n, as_json
+    ))
 
   invisible(TRUE)
 }
 
-#' @title get log file name
-#'
-#' @return the file path of log which was set by user
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' getLogName()
-#' }
-getLogName <- function() {
-  .config$log_name
-}
-
-#' @title get log file connection
-getLogCon <- function() {
-  .config$log_con
-}
-
-#' @title check if the file connection is opened
+# check if the file connection is opened
 isOpenCon <- function() {
   con <- getLogCon()
 
@@ -96,8 +108,6 @@ closelog <- function(verbose = TRUE) {
 #' @param units the max size units, should be one of `Kb`, `b`, `Mb`, `Gb`, `Tb`, `Pb`
 #' @param verbose if print success message
 #'
-#' @export
-#'
 #' @examples
 #' \dontrun{
 #' setMaxBytes(100*1024)
@@ -130,19 +140,6 @@ setMaxSize <- function(max_size, units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
   invisible(TRUE)
 }
 
-#' @title get log file max size
-#'
-#' @return the max size of log file which was set by user
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' getMaxBytes()
-#' }
-getMaxSize <- function() {
-  utils:::format.object_size(.config$max_size, 'auto')
-}
-
 #' @title set log file backup number
 #'
 #' @description if the backup log file number is more than `backup_n`, the earliest log file
@@ -151,8 +148,6 @@ getMaxSize <- function() {
 #'
 #' @param backup_n the max number of backup log file
 #' @param verbose if print success message
-#'
-#' @export
 #'
 #' @examples
 #' \dontrun{
@@ -172,15 +167,40 @@ setBackupN <- function(backup_n, verbose = TRUE) {
   invisible(TRUE)
 }
 
-#' @title get log file backup number
+# get log file name
+getLogName <- function() {
+  .config$log_name
+}
+
+# get log file connection
+getLogCon <- function() {
+  .config$log_con
+}
+
+# get log file max size
+getMaxSize <- function() {
+  tryCatch(
+    utils:::format.object_size(.config$max_size, 'auto'),
+    error = function(e) NULL
+  )
+}
+
+# get log file backup number
+getBackupN <- function() {
+  .config$backup_n
+}
+
+getLogLevel <- function() {
+  names(.config$log_level)
+}
+
+#' @title get log configuration
 #'
-#' @return the number of backup log file which was set by user
+#' @return log name, log level, rotate type, backup number, max size, if convert input to json
 #' @export
 #'
 #' @examples
-#' \dontrun{
-#' getBackupN()
-#' }
-getBackupN <- function() {
-  .config$backup_n
+getLogInfo <- function() {
+  res <- as.list(.config)
+  modifyList(res, list(log_level = getLogLevel(), max_size = getMaxSize()))
 }
