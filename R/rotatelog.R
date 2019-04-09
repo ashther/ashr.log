@@ -65,9 +65,9 @@ rotatelog <- function(..., .level = 0) {
     # rename log file to log.1, and re-create new log file
     closelog(FALSE)
     file.rename(.config$log_name, paste0(.config$log_name, '.1'))
-    printlog(..., .level = .level)
+    .printlog(..., .level = .level)
 
   } else {
-    printlog(..., .level = .level)
+    .printlog(..., .level = .level)
   }
 }

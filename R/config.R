@@ -23,7 +23,7 @@
 #' openlog('log/log')
 #' }
 openlog <- function(log_name, log_level = INFO,
-                    rotate = c('size', 'daily'), max_size = 100, backup_n = 5L,
+                    rotate = c('size', 'daily', 'none'), max_size = 100, backup_n = 5L,
                     units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
                     as_json = TRUE, verbose = FALSE) {
   rotate <- match.arg(rotate)
@@ -193,9 +193,14 @@ getLogLevel <- function() {
 #' @title get log configuration
 #'
 #' @return log name, log level, rotate type, backup number, max size, if convert input to json
+#'
+#' @importFrom utils modifyList
 #' @export
 #'
 #' @examples
+#' \dontrun{
+#' getLogInfo()
+#' }
 getLogInfo <- function() {
   res <- as.list(.config)
   modifyList(res, list(log_level = getLogLevel(),

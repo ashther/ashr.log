@@ -4,6 +4,7 @@
 #' @description provide daily log function
 #'
 #' @param ... the message output to log file
+#' @param .level the log message level
 #'
 #' @details expecpt the main log file, other log file will be named with its
 #' last modify day, like `log.2000-01-01`, and with only \code{backou_n} log files in this log directory
@@ -31,11 +32,11 @@ dailylog <- function(..., .level = 0) {
     # rename this log to its create-day, and open new one
     closelog(FALSE)
     file.rename(log_name, paste(log_name, day_last_modify, sep = '.'))
-    printlog(..., .level = .level)
+    .printlog(..., .level = .level)
 
   } else {
     # well, this log is today's log, go ahead
-    printlog(..., .level = .level)
+    .printlog(..., .level = .level)
   }
 
   # 1. list all log file under this directory

@@ -4,10 +4,24 @@
 \alias{openlog}
 \title{set log file}
 \usage{
-openlog(log_name, verbose = TRUE)
+openlog(log_name, log_level = INFO, rotate = c("size", "daily",
+  "none"), max_size = 100, backup_n = 5L, units = c("Kb", "b", "Mb",
+  "Gb", "Tb", "Pb"), as_json = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{log_name}{log file name}
+
+\item{log_level}{`ERROR`, `INFO` or `DEBUG`, constant in this package}
+
+\item{rotate}{`size` or `daily`, the type of rotate log}
+
+\item{max_size}{the max file size in bytes}
+
+\item{backup_n}{the backup log files number, must be non-negative}
+
+\item{units}{the max size units, should be one of `Kb`, `b`, `Mb`, `Gb`, `Tb`, `Pb`}
+
+\item{as_json}{if all log input will be convert to json, default is true}
 
 \item{verbose}{if print success message}
 }

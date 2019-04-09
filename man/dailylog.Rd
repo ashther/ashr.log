@@ -4,10 +4,12 @@
 \alias{dailylog}
 \title{daily log}
 \usage{
-dailylog(...)
+dailylog(..., .level = 0)
 }
 \arguments{
 \item{...}{the message output to log file}
+
+\item{.level}{the log message level}
 }
 \description{
 provide daily log function

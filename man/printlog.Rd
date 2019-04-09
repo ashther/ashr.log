@@ -4,11 +4,13 @@
 \alias{printlog}
 \title{cat message to log}
 \usage{
-printlog(...)
+printlog(..., .level = 0)
 }
 \arguments{
 \item{...}{content to be loged, cause we use `cat` function behind the hood, you can put any
 R object here}
+
+\item{.level}{the log message level}
 }
 \description{
 just like `cat`, with a timestamp

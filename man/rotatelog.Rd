@@ -4,10 +4,12 @@
 \alias{rotatelog}
 \title{ratate log}
 \usage{
-rotatelog(...)
+rotatelog(..., .level = 0)
 }
 \arguments{
 \item{...}{the message output to log file}
+
+\item{.level}{the log message level}
 }
 \description{
 provide rotate log function

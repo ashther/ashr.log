@@ -4,7 +4,8 @@ test_that("setting and getting", {
 
   log_name <- file.path(tempdir(), 'log/log')
   openlog(log_name)
-  expect_equal(getLogName(), log_name)
+  temp <- getLogInfo()
+  expect_equal(temp$log_name, log_name)
 
   expect_true(ashr.log:::isOpenCon())
   # can't test on linux
@@ -12,10 +13,16 @@ test_that("setting and getting", {
   # expect_true(file.exists(log_name))
 
   closelog()
-  unlink(dirname(getLogName()), TRUE)
+  unlink(dirname(log_name), TRUE)
 
-  setBackupN(6)
-  expect_equal(getBackupN(), 6)
+  openlog(log_name, log_level = DEBUG, rotate = 'daily',
+          max_size = 666, units = 'b', backup_n = 6, as_json = FALSE)
+  temp <- getLogInfo()
+  expect_equal(temp$backup_n, 6)
+  expect_false(temp$as_json)
+  expect_equal(temp$log_level, 'DEBUG')
+  expect_equal(temp$max_size, '666 bytes')
+  expect_equal(temp$rotate, 'daily')
 
   setMaxSize(1, units = 'Kb')
   expect_equal(getMaxSize(), '1 Kb')
@@ -31,68 +38,89 @@ test_that("setting and getting", {
 
   setMaxSize(1, units = 'Mb')
   expect_equal(getMaxSize(), '1 Mb')
+
+  closelog()
+  unlink(dirname(log_name), TRUE)
 })
+
+# TODO test leg level
 
 test_that('print to log file', {
 
   log_name <- file.path(tempdir(), 'log/log')
 
-  openlog(log_name)
+  openlog(log_name, as_json = FALSE, rotate = 'none')
   printlog('this is a test plain message')
-  temp <- readLines(getLogName())
-  temp <- strsplit(temp, '\\s\\]\\s')[[1]][2]
+  temp <- readLines(log_name)
+  temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[1]][2]
   temp <- trimws(temp)
   expect_equal(temp, 'this is a test plain message')
 
   closelog()
-  unlink(dirname(getLogName()), TRUE)
+  unlink(dirname(log_name), TRUE)
+
+  openlog(log_name, as_json = TRUE, rotate = 'none')
+  printlog('this is a array message')
+  temp <- readLines(log_name)
+  temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[1]][2]
+  temp <- trimws(temp)
+  expect_equal(temp, "[\"this is a array message\"]")
+
+  printlog(msg = 'this is a test message')
+  temp <- readLines(log_name)[2]
+  temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[1]][2]
+  temp <- trimws(temp)
+  expect_equal(temp, "{\"msg\":\"this is a test message\"}")
+
+  closelog()
+  unlink(dirname(log_name), TRUE)
 })
 
 test_that('rotate log', {
 
   log_name <- file.path(tempdir(), 'log/log')
 
-  openlog(log_name)
-  setMaxSize(1, units = 'Kb')
-  setBackupN(3)
-  rotatelog(paste(rep(letters, 10), collapse = ''))
-  temp <- list.files(dirname(getLogName()))
+  openlog(log_name, rotate = 'size', max_size = 1, units = 'Kb', backup_n = 3, as_json = FALSE)
+  # setMaxSize(1, units = 'Kb')
+  # setBackupN(3)
+  printlog(paste(rep(letters, 10), collapse = ''))
+  temp <- list.files(dirname(log_name))
   expect_equal(length(temp), 1)
   expect_equal(temp, 'log')
 
-  invisible(lapply(1:5, rotatelog, ... = paste(rep(letters, 10), collapse = '')))
-  temp <- list.files(dirname(getLogName()))
+  invisible(lapply(1:5, printlog, ... = paste(rep(letters, 10), collapse = '')))
+  temp <- list.files(dirname(log_name))
   expect_equal(length(temp), 2)
   expect_equal(temp, c('log', 'log.1'))
 
-  invisible(lapply(1:5, rotatelog, ... = paste(rep(letters, 10), collapse = '')))
-  temp <- list.files(dirname(getLogName()))
+  invisible(lapply(1:5, printlog, ... = paste(rep(letters, 10), collapse = '')))
+  temp <- list.files(dirname(log_name))
   expect_equal(length(temp), 3)
   expect_equal(temp, c('log', 'log.1', 'log.2'))
 
-  invisible(lapply(1:10, rotatelog, ... = paste(rep(letters, 10), collapse = '')))
-  temp <- list.files(dirname(getLogName()))
+  invisible(lapply(1:10, printlog, ... = paste(rep(letters, 10), collapse = '')))
+  temp <- list.files(dirname(log_name))
   expect_equal(length(temp), 4)
   expect_equal(temp, c('log', 'log.1', 'log.2', 'log.3'))
 
-  invisible(lapply(1:5, rotatelog, ... = paste(rep(letters, 10), collapse = '')))
-  temp <- list.files(dirname(getLogName()))
+  invisible(lapply(1:5, printlog, ... = paste(rep(letters, 10), collapse = '')))
+  temp <- list.files(dirname(log_name))
   expect_equal(length(temp), 4)
   expect_equal(temp, c('log', 'log.1', 'log.2', 'log.3'))
 
   closelog()
-  unlink(dirname(getLogName()), TRUE)
+  unlink(dirname(log_name), TRUE)
 })
 
 test_that('daily log', {
   msg_test <- 'write message to an old log file'
 
   log_name <- file.path(tempdir(), 'log/log')
-  openlog(log_name)
+  openlog(log_name, rotate = 'daily', as_json = FALSE)
 
-  dailylog(msg_test)
-  temp <- readLines(getLogName())
-  temp <- strsplit(temp, '\\s\\]\\s')[[1]][2]
+  printlog(msg_test)
+  temp <- readLines(log_name)
+  temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[1]][2]
   temp <- trimws(temp)
   expect_equal(temp, msg_test)
 
@@ -106,19 +134,21 @@ test_that('daily log', {
     res <- system(sprintf(cmd, log_name), intern = TRUE)
     expect_equal(res, character(0))
 
-    dailylog(msg_test)
-    temp <- list.files(dirname(getLogName()))
+    printlog(msg_test)
+    temp <- list.files(dirname(log_name))
     expect_equal(temp, c('log', 'log.1986-06-22'))
     file.remove(file.path(dirname(log_name), 'log.1986-06-22'))
   }
+  closelog()
 
+  openlog(log_name, rotate = 'daily', backup_n = 2)
   file.create(file.path(dirname(log_name), 'log.2000-01-01'))
   file.create(file.path(dirname(log_name), 'log.2000-01-02'))
   file.create(file.path(dirname(log_name), 'log.2000-01-03'))
   file.create(file.path(dirname(log_name), 'log.2000-01-04'))
-  setBackupN(2)
-  dailylog(msg_test)
-  temp <- list.files(dirname(getLogName()))
+  # setBackupN(2)
+  printlog(msg_test)
+  temp <- list.files(dirname(log_name))
   expect_equal(temp, c('log', 'log.2000-01-03', 'log.2000-01-04'))
 
   closelog()
@@ -128,13 +158,14 @@ test_that('daily log', {
 test_that('read log', {
 
   log_name <- file.path(tempdir(), 'log/log')
-  openlog(log_name)
-  setMaxSize(100, 'b') # different file size between windows and linux
-  setBackupN(5)
+  # different file size between windows and linux
+  openlog(log_name, max_size = 100, units = 'b', backup_n = 5)
+  # setMaxSize(100, 'b')
+  # setBackupN(5)
 
-  rotatelog(jsonlite::toJSON(list(x = paste0(letters, collapse = '')), auto_unbox = TRUE))
+  printlog(x = paste0(letters, collapse = ''))
   invisible(lapply(1:10, function(x) {
-    rotatelog(jsonlite::toJSON(list(y = paste0(1:10, collapse = '')), auto_unbox = TRUE))
+    printlog(y = paste0(1:10, collapse = ''))
   }))
   temp <- readlog(as_json = FALSE)
   expect_is(temp, 'tbl_df')
