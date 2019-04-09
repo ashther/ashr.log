@@ -41,6 +41,10 @@ printlog <- function(..., .level = 0) {
     createIfNotExist()
   }
 
-  ts <- paste('[', as.character(Sys.time()), ']')
-  cat(ts, ..., '\n', file = getLogCon(), append = TRUE)
+  ts <- paste0('[', as.character(Sys.time()), ']')
+  if (.config$as_json)
+    cat(ts, jsonlite::toJSON(list(...), auto_unbox = TRUE),
+        '\n', file = getLogCon(), append = TRUE)
+  else
+    cat(ts, ..., '\n', file = getLogCon(), append = TRUE)
 }
