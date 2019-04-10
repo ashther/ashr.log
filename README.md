@@ -16,21 +16,8 @@ devtools::install_github('ashther/ashr.log')
 ```
 
 ## Example
-You can specify the rotating log with max file size and backup file number, for 
-example, we want to limit each bakcup log file size only to 200kB, and 5 log files
-at most:
-```r
-setLogName('log/log')
-setMaxBytes(200*1024)
-setBackupN(5)
-
-printlog('this message will be output directly to log file')
-rotatelog('before output message to log file, the file size and backup number will be checked first')
-```
+TODO
 
 ## TODO
-- add log level error info debug
-- make log message as json string
-- use openlog instead of setMaxSize setBackupN
-- use printlog instead of rotatelog dailylog, set rotate type in openlog
-- use infolog instead of getLogName getMaxSize getBackupN
+- better get and set founction for internal usage
+- more unit test
