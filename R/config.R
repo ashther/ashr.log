@@ -27,8 +27,7 @@ openlog <- function(log_name, log_level = INFO,
                     units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
                     as_json = TRUE, verbose = FALSE) {
   rotate <- match.arg(rotate)
-  # log_level <- as.numeric(log_level)
-  # if (is.na(log_level)) stop('log_level must be numeric!')
+  if (is.na(as.numeric(log_level))) stop('log_level must be numeric!')
   as_json <- as.logical(as_json)
   if (is.na(as_json)) stop('as_json must be logical!')
   verbose <- as.logical(verbose)
@@ -63,6 +62,60 @@ openlog <- function(log_name, log_level = INFO,
   invisible(TRUE)
 }
 
+appendVal <- function(val, params, .l) {
+  val <- val[1]
+  if (!names(val) %in% names(.l)) {
+    params <- append(params, val)
+  } else {
+    params <- append(params, .l[names(val)])
+  }
+  params
+}
+
+# for rotatelog and dailylog, close and reopen
+reopenlog <- function(.l) {
+  params <- list()
+
+  if (!'log_name' %in% names(.l)) {
+    stop('no log name in configuration!', call. = FALSE)
+  } else {
+    params <- append(params, .l['log_name'])
+  }
+
+  params <- appendVal(list(rotate = 'size'), params, .l)
+  params <- appendVal(list(backup_n = 5), params, .l)
+  params <- appendVal(list(as_json = TRUE), params, .l)
+  params <- append(params, list(verbose = FALSE))
+
+  if (!'log_level' %in% names(.l)) {
+    params <- append(params, list(log_level = INFO))
+  } else {
+    params <- append(params, list(log_level = get(.l$log_level)))
+  }
+
+  if (!'max_size' %in% names(.l)) {
+    params <- append(params, list(max_size = 100, units = 'Kb'))
+  } else {
+    max_size <- unlist(strsplit(.l$max_size, ' '))
+    max_size_value <- as.numeric(max_size[1])
+    max_size_units <- switch(
+      max_size[2],
+      bytes = 'b',
+      Kb = 'Kb',
+      Mb = 'Mb',
+      Gb = 'Gb',
+      Tb = 'Tb',
+      Pb = 'Pb'
+    )
+    params <- append(
+      params, list(max_size = max_size_value, units = max_size_units)
+    )
+  }
+
+  do.call(openlog, params)
+
+}
+
 # check if the file connection is opened
 isOpenCon <- function() {
   con <- .config$log_con
@@ -93,6 +146,7 @@ closelog <- function(verbose = TRUE) {
 
   if (isOpenCon()) {
     close(.config$log_con)
+    .config$log_name <- NULL
     if (verbose)
       message('log file connection closed.')
     return(invisible(TRUE))

@@ -67,6 +67,7 @@ readSingleLog <- function(log_file) {
   }))
 }
 
+# TODO fix bug about no names vector as log content
 fromJSONLog <- function(log_df) {
   log_temp <- lapply(log_df$log, jsonlite::fromJSON)
   log_temp <- dplyr::bind_rows(log_temp)

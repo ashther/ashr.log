@@ -30,8 +30,10 @@ dailylog <- function(..., .level = 0) {
   if (day_last_modify != Sys.Date()) {
 
     # rename this log to its create-day, and open new one
+    .l <- getLogInfo()
     closelog(FALSE)
-    file.rename(log_name, paste(log_name, day_last_modify, sep = '.'))
+    file.rename(.l$log_name, paste(.l$log_name, day_last_modify, sep = '.'))
+    reopenlog(.l)
     .printlog(..., .level = .level)
 
   } else {
