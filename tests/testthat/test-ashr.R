@@ -43,7 +43,61 @@ test_that("setting and getting", {
   unlink(dirname(log_name), TRUE)
 })
 
-# TODO test leg level
+test_that('log level', {
+
+  log_name <- file.path(tempdir(), 'log/log')
+  openlog(log_name, as_json = FALSE)
+
+  printlog(msg = 'this is info message', .level = INFO)
+  printlog(msg = 'this is error message', .level = ERROR)
+  printlog(msg = 'this is debug message', .level = DEBUG)
+
+  temp <- readLines(log_name)
+  temp <- sapply(
+    strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE),
+    `[[`, 2
+  )
+  temp <- trimws(temp)
+  expect_equal(temp, c('this is info message', 'this is error message'))
+
+  closelog()
+  unlink(dirname(log_name), TRUE)
+
+  openlog(log_name, as_json = FALSE, log_level = ERROR)
+
+  printlog(msg = 'this is info message', .level = INFO)
+  printlog(msg = 'this is error message', .level = ERROR)
+  printlog(msg = 'this is debug message', .level = DEBUG)
+
+  temp <- readLines(log_name)
+  temp <- sapply(
+    strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE),
+    `[[`, 2
+  )
+  temp <- trimws(temp)
+  expect_equal(temp, 'this is error message')
+
+  closelog()
+  unlink(dirname(log_name), TRUE)
+
+  openlog(log_name, as_json = FALSE, log_level = DEBUG)
+
+  printlog(msg = 'this is info message', .level = INFO)
+  printlog(msg = 'this is error message', .level = ERROR)
+  printlog(msg = 'this is debug message', .level = DEBUG)
+
+  temp <- readLines(log_name)
+  temp <- sapply(
+    strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE),
+    `[[`, 2
+  )
+  temp <- trimws(temp)
+  expect_equal(temp, c('this is info message', 'this is error message',
+                       'this is debug message'))
+
+  closelog()
+  unlink(dirname(log_name), TRUE)
+})
 
 test_that('print to log file', {
 
