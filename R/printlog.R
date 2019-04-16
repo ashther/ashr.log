@@ -2,7 +2,7 @@
 #' @title create diretory or/and file if log file path doesn't exits
 createIfNotExist <- function() {
   # get dir name of log, create the dir and file it they dont exist
-  log_name <- getLogName()
+  log_name <- .config$log_name
 
   log_files_path <- dirname(log_name)
   if (!dir.exists(log_files_path)) dir.create(log_files_path, recursive = TRUE)
@@ -21,7 +21,7 @@ createIfNotExist <- function() {
     return(invisible())
 
   if (!isOpenCon()) {
-    if (is.null(getLogName())) {
+    if (is.null(.config$log_name)) {
       warning("log file connection wasn't opened!", call. = FALSE)
       return(invisible())
     }
@@ -31,9 +31,9 @@ createIfNotExist <- function() {
   ts <- paste0('[', as.character(Sys.time()), ']')
   if (.config$as_json)
     cat(ts, jsonlite::toJSON(list(...), auto_unbox = TRUE),
-        '\n', file = getLogCon(), append = TRUE)
+        '\n', file = .config$log_con, append = TRUE)
   else
-    cat(ts, ..., '\n', file = getLogCon(), append = TRUE)
+    cat(ts, ..., '\n', file = .config$log_con, append = TRUE)
 }
 
 #' @title cat message to log

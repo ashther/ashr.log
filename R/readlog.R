@@ -95,7 +95,7 @@ readlog <- function(.time = 'today', as_json = TRUE) {
 
   # got all log files in the log directory, including rotate log and daily log
   time_limit <- periodToTime(.time)
-  log_name <- getLogName()
+  log_name <- .config$log_name
   log_files_path <- dirname(log_name)
   log_files <- list.files(
     log_files_path,

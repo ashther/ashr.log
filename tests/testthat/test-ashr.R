@@ -206,7 +206,7 @@ test_that('daily log', {
   expect_equal(temp, c('log', 'log.2000-01-03', 'log.2000-01-04'))
 
   closelog()
-  unlink(dirname(getLogName()), TRUE)
+  unlink(dirname(log_name), TRUE)
 })
 
 test_that('read log', {
@@ -229,5 +229,5 @@ test_that('read log', {
   expect_equal(colnames(temp), c('timestamp', 'y', 'x'))
 
   closelog()
-  unlink(dirname(getLogName()), TRUE)
+  unlink(dirname(log_name), TRUE)
 })

@@ -17,7 +17,7 @@
 #' }
 dailylog <- function(..., .level = 0) {
 
-  log_name <- getLogName()
+  log_name <- .config$log_name
   if (is.null(log_name)) {
     warning("log file wasn't set already!", call. = FALSE)
     return(invisible())
@@ -48,8 +48,8 @@ dailylog <- function(..., .level = 0) {
     pattern = paste0('^', basename(log_name), '\\.\\d{4}-\\d{2}-\\d{2}$'),
     full.names = TRUE
   )
-  if (length(log_files) > getBackupN()) {
-    n_delete <- length(log_files) - getBackupN()
+  if (length(log_files) > .config$backup_n) {
+    n_delete <- length(log_files) - .config$backup_n
     log_files <- sort(log_files)
     file.remove(log_files[seq_len(n_delete)])
   }

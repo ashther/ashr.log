@@ -1,7 +1,7 @@
 
 .onLoad <- function(libname, pkgname) {
   setMaxSize(100, verbose = FALSE)
-  setBackupN(5L, verbose = FALSE)
+  .config$backup_n <- 5
   .config$log_level <- INFO
   .config$rotate <- 'size'
   .config$as_json <- TRUE

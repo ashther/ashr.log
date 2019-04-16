@@ -39,19 +39,25 @@ openlog <- function(log_name, log_level = INFO,
     log_name <- log_name[1]
   }
 
+  backup_n <- as.integer(backup_n)
+  if (is.na(backup_n))
+    stop("the max backup log file number parameter can't be converted to integer!",
+         call. = FALSE)
+
   .config$log_name <- log_name
   createIfNotExist()
 
   .config$log_level <- log_level
   .config$rotate <- rotate
   setMaxSize(max_size, units, FALSE)
-  setBackupN(backup_n, FALSE)
+  .config$backup_n <- backup_n
   .config$as_json <- as_json
 
   if (verbose)
     message(sprintf(
       'log file was set to %s, \nlog level is %s, \nrotate type is %s, \nmax size is %s, \nbackup number is %s, \nconvert input to json is %s',
-      getLogName(), getLogLevel(), rotate, getMaxSize(), getBackupN(), as_json
+      .config$log_name, names(.config$log_level), .config$rotate,
+      getMaxSize(), .config$backup_n, .config$as_json
     ))
 
   invisible(TRUE)
@@ -59,7 +65,7 @@ openlog <- function(log_name, log_level = INFO,
 
 # check if the file connection is opened
 isOpenCon <- function() {
-  con <- getLogCon()
+  con <- .config$log_con
 
   if (is.null(con))
     return(FALSE)
@@ -80,13 +86,13 @@ isOpenCon <- function() {
 #' closelog()
 #' }
 closelog <- function(verbose = TRUE) {
-  if (is.null(getLogName())) {
+  if (is.null(.config$log_name)) {
     warning("log file wasn't set already!", call. = FALSE)
     return(invisible())
   }
 
   if (isOpenCon()) {
-    close(getLogCon())
+    close(.config$log_con)
     if (verbose)
       message('log file connection closed.')
     return(invisible(TRUE))
@@ -136,58 +142,12 @@ setMaxSize <- function(max_size, units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
   invisible(TRUE)
 }
 
-#' @title set log file backup number
-#'
-#' @description if the backup log file number is more than `backup_n`, the earliest log file
-#' will be removed, and all log file will add 1 like 'log.1' -> 'log.2', the log message
-#' will be output to new log file
-#'
-#' @param backup_n the max number of backup log file
-#' @param verbose if print success message
-#'
-#' @examples
-#' \dontrun{
-#' setBackupN(5)
-#' }
-setBackupN <- function(backup_n, verbose = TRUE) {
-  backup_n <- as.numeric(backup_n)
-  if (is.na(backup_n))
-    stop("the max backup log file number parameter can't be converted to integer!",
-         call. = FALSE)
-
-  .config$backup_n <- backup_n
-
-  if (verbose)
-    message(sprintf('the number of backup log file was set to %s', backup_n))
-
-  invisible(TRUE)
-}
-
-# get log file name
-getLogName <- function() {
-  .config$log_name
-}
-
-# get log file connection
-getLogCon <- function() {
-  .config$log_con
-}
-
 # get log file max size
 getMaxSize <- function() {
   tryCatch(
     utils:::format.object_size(.config$max_size, 'auto'),
     error = function(e) NULL
   )
-}
-
-# get log file backup number
-getBackupN <- function() {
-  .config$backup_n
-}
-
-getLogLevel <- function() {
-  names(.config$log_level)
 }
 
 #' @title get log configuration
@@ -203,7 +163,7 @@ getLogLevel <- function() {
 #' }
 getLogInfo <- function() {
   res <- as.list(.config)
-  modifyList(res, list(log_level = getLogLevel(),
+  modifyList(res, list(log_level = names(.config$log_level),
                        log_con = isOpenCon(),
                        max_size = getMaxSize()))
 }
