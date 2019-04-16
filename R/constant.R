@@ -2,8 +2,8 @@
 # names(FATAL) <- "FATAL"
 ERROR <- 2L
 names(ERROR) <- "ERROR"
-# WARN <- 4L
-# names(WARN) <- "WARN"
+WARN <- 4L
+names(WARN) <- "WARN"
 INFO <- 6L
 names(INFO) <- "INFO"
 DEBUG <- 8L
