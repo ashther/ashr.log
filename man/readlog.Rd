@@ -4,10 +4,11 @@
 \alias{readlog}
 \title{read log files}
 \usage{
-readlog(as_json = TRUE, .time = "today")
+readlog(as_json, .time = "today")
 }
 \arguments{
-\item{as_json}{if convert log column to multiple columns}
+\item{as_json}{if convert log column to multiple columns, it will use `as_json`
+in configuration if this is not provided}
 
 \item{.time}{the min timestamp in log files}
 }

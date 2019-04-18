@@ -88,7 +88,8 @@ fromJSONLog <- function(log_df) {
 #'
 #' @description read log files, and convert to data frame
 #'
-#' @param as_json if convert log column to multiple columns
+#' @param as_json if convert log column to multiple columns, it will use `as_json`
+#' in configuration if this is not provided
 #' @param .time the min timestamp in log files
 #'
 #' @return log data frame
@@ -98,13 +99,20 @@ fromJSONLog <- function(log_df) {
 #' \dontrun{
 #' readlog('today', TRUE)
 #' }
-readlog <- function(as_json = TRUE, .time = 'today') {
+readlog <- function(as_json, .time = 'today') {
   stopifnot(is.character(.time))
+  time_limit <- periodToTime(.time)
+
+  if (missing(as_json))
+    as_json <- .config$as_json
   stopifnot(is.logical(as_json))
 
   # got all log files in the log directory, including rotate log and daily log
-  time_limit <- periodToTime(.time)
   log_name <- .config$log_name
+  if (is.null(log_name)) {
+    warning('no log name to read!', call. = FALSE)
+    return(dplyr::tibble(timestamp = as.POSIXct(NA), log = character(0)))
+  }
   log_files_path <- dirname(log_name)
   log_files <- list.files(
     log_files_path,
@@ -121,7 +129,7 @@ readlog <- function(as_json = TRUE, .time = 'today') {
   log_files <- sort(log_files)
 
   if (length(log_files) == 0) {
-    warning('no log files to read!')
+    warning('no log files to read!', call. = FALSE)
     return(dplyr::tibble(timestamp = as.POSIXct(NA), log = character(0)))
   }
 

@@ -22,7 +22,7 @@ createIfNotExist <- function() {
 
   if (!isOpenCon()) {
     if (is.null(.config$log_name)) {
-      warning("log file connection wasn't opened!", call. = FALSE)
+      warning("log file wasn't set already!", call. = FALSE)
       return(invisible())
     }
     createIfNotExist()

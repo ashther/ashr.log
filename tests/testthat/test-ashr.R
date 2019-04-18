@@ -127,6 +127,7 @@ test_that('print to log file', {
   expect_equal(temp, "{\"msg\":\"this is a test message\"}")
 
   closelog()
+  expect_warning(printlog('test'), "log file wasn't set already!")
   unlink(dirname(log_name), TRUE)
 })
 
@@ -224,9 +225,24 @@ test_that('read log', {
   temp <- readlog(as_json = FALSE)
   expect_is(temp, 'tbl_df')
   expect_equal(colnames(temp), c('timestamp', 'log'))
-  temp <- readlog(as_json = TRUE)
+  temp <- readlog()
   expect_is(temp, 'tbl_df')
   expect_equal(colnames(temp), c('timestamp', 'y', 'x'))
+
+  closelog()
+
+  openlog(log_name, as_json = FALSE)
+  temp <- readlog()
+  expect_is(temp, 'tbl_df')
+  expect_equal(colnames(temp), c('timestamp', 'log'))
+
+  closelog()
+
+  openlog(log_name)
+  printlog('message without names')
+  temp <- readlog()
+  expect_is(temp, 'tbl_df')
+  expect_equal(colnames(temp), c('timestamp', 'y', 'log', 'x'))
 
   closelog()
   unlink(dirname(log_name), TRUE)
