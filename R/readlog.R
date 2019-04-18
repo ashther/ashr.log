@@ -57,7 +57,10 @@ periodToTime <- function(time_string) {
 
 readSingleLog <- function(log_file) {
   x <- readLines(log_file)
-  x <- strsplit(x, '^\\[\\s*|\\s*]\\s+')
+  x <- strsplit(
+    x, '^\\[\\s*(?=\\d{4}-\\d{2}-\\d{2})|(?<=\\d{2}:\\d{2}:\\d{2})\\s*\\]\\s+',
+    perl = TRUE
+  )
 
   if (length(x) == 0)
     return(dplyr::tibble(timestamp = as.POSIXct(NA), log = character(0)))
@@ -67,9 +70,14 @@ readSingleLog <- function(log_file) {
   }))
 }
 
-# TODO fix bug about no names vector as log content
 fromJSONLog <- function(log_df) {
-  log_temp <- lapply(log_df$log, jsonlite::fromJSON)
+  log_temp <- lapply(log_df$log, function(x) {
+    x <- jsonlite::fromJSON(x)
+    # if log content is a array without names
+    if (is.null(names(x)))
+      return(dplyr::tibble(log = x))
+    x
+  })
   log_temp <- dplyr::bind_rows(log_temp)
   dplyr::as_tibble(
     cbind(log_df[, 'timestamp', drop = FALSE], log_temp)
@@ -80,8 +88,8 @@ fromJSONLog <- function(log_df) {
 #'
 #' @description read log files, and convert to data frame
 #'
-#' @param .time the min timestamp in log files
 #' @param as_json if convert log column to multiple columns
+#' @param .time the min timestamp in log files
 #'
 #' @return log data frame
 #' @export
@@ -90,7 +98,7 @@ fromJSONLog <- function(log_df) {
 #' \dontrun{
 #' readlog('today', TRUE)
 #' }
-readlog <- function(.time = 'today', as_json = TRUE) {
+readlog <- function(as_json = TRUE, .time = 'today') {
   stopifnot(is.character(.time))
   stopifnot(is.logical(as_json))
 
