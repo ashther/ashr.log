@@ -18,24 +18,24 @@ devtools::install_github('ashther/ashr.log')
 ## Example
 When `ashr.log` is loaded, the global log configuration will be set, such as log max size, log rotate type, etc. 
 Open the log file, opening the file connection for outputing log content meanwhile.
-```
+``` r
 openlog('log/log') # with default configuration
 # TODO more configuration setting
 ```
 
 Print the log content to log file, with the rotate type(or not) which is in global configuration.
-```
+``` r
 printlog(msg = 'normal message', id = id)
 # TODO more printlog style
 ```
 
 Close log connection, and delete the log file name in global configuration.
-```
+``` r
 closelog()
 ```
 
 We often need to analysis script running history, API error response, long-running task process, etc. A handful and simple functionality about reading log files in, cleaning and manipulating is very imporatant.
-```
+``` r
 readlog() # use default argument, and the log file name in global configuration
 # TODO more readlog type
 ```
