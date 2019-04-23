@@ -245,5 +245,14 @@ test_that('read log', {
   expect_equal(colnames(temp), c('timestamp', 'y', 'log', 'x'))
 
   closelog()
+
+  temp <- readlog(log_name = log_name)
+  expect_is(temp, 'tbl_df')
+  expect_equal(colnames(temp), c('timestamp', 'y', 'log', 'x'))
+
+  temp <- readlog(log_name = dirname(log_name))
+  expect_is(temp, 'tbl_df')
+  expect_equal(colnames(temp), c('timestamp', 'y', 'log', 'x'))
+
   unlink(dirname(log_name), TRUE)
 })

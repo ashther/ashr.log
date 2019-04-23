@@ -91,15 +91,39 @@ fromJSONLog <- function(log_df) {
 #' @param as_json if convert log column to multiple columns, it will use `as_json`
 #' in configuration if this is not provided
 #' @param .time the min timestamp in log files
+#' @param log_name log file name will be used if this argument is missing, otherwise
+#' `readlog` will read `log_name`, `log_name` can be either file or directory
 #'
 #' @return log data frame
 #' @export
 #'
+#' @importFrom utils file_test
+#'
 #' @examples
 #' \dontrun{
-#' readlog('today', TRUE)
+#' readlog()
+#' readlog(FALSE)
+#' readlog(TRUE, 'today')
+#'
+#' readlog(.time = 'yesterday')
+#' readlog(.time = '2 days')
+#' readlog(.time = 'this minute')
+#' readlog(.time = 'this min')
+#' readlog(.time = '3 minutes')
+#' readlog(.time = '1 hour')
+#' readlog(.time = 'this hour')
+#' readlog(.time = '3 weeks')
+#' readlog(.time = 'this week')
+#' readlog(.time = 'this month')
+#' readlog(.time = 'this mon')
+#' readlog(.time = '2 months')
+#' readlog(.time = 'this year')
+#' readlog(.time = '2 years')
+#'
+#' readlog(log_name = 'log/log') # custom log files
+#' readlog(log_name = 'log/') # read all log files in log direcotry
 #' }
-readlog <- function(as_json, .time = 'today') {
+readlog <- function(as_json, .time = 'today', log_name) {
   stopifnot(is.character(.time))
   time_limit <- periodToTime(.time)
 
@@ -108,24 +132,30 @@ readlog <- function(as_json, .time = 'today') {
   stopifnot(is.logical(as_json))
 
   # got all log files in the log directory, including rotate log and daily log
-  log_name <- .config$log_name
+  if (missing(log_name))
+    log_name <- .config$log_name
+
   if (is.null(log_name)) {
     warning('no log name to read!', call. = FALSE)
     return(dplyr::tibble(timestamp = as.POSIXct(NA), log = character(0)))
   }
-  log_files_path <- dirname(log_name)
-  log_files <- list.files(
-    log_files_path,
-    pattern = paste0(
+
+  if (file_test('-d', log_name)) {
+    log_files_path <- log_name
+    pattern <- NULL
+  } else {
+    log_files_path <- dirname(log_name)
+    pattern <- paste0(
       # pattern match:
       # 1. log
       # 2. log.1
       # 3. log.2000-01-01
       '^', basename(log_name), c('$', '\\.\\d+$', '\\.\\d{4}-\\d{2}-\\d{2}$'),
       collapse = '|'
-    ),
-    full.names = TRUE
-  )
+    )
+  }
+
+  log_files <- list.files(log_files_path, pattern = pattern, full.names = TRUE)
   log_files <- sort(log_files)
 
   if (length(log_files) == 0) {
