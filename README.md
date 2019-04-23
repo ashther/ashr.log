@@ -20,13 +20,19 @@ When `ashr.log` is loaded, the global log configuration will be set, such as log
 Open the log file, opening the file connection for outputing log content meanwhile.
 ``` r
 openlog('log/log') # with default configuration
-# TODO more configuration setting
+openlog('log/log', log_level = ERROR) # only check log when error happened
+openlog('log/log', rotate = 'daily') # save log daily
+openlog('log/log', max_size = 3, units = 'Mb') # a litter bigger log file
+openlog('log/log', backup_n = 10)
+openlog('log/log', as_json = FALSE)
 ```
 
 Print the log content to log file, with the rotate type(or not) which is in global configuration.
 ``` r
 printlog(msg = 'normal message', id = id)
-# TODO more printlog style
+
+# if as_json is TRUE in configuration, the log content will be like '[plain message]'
+printlog('plain message')  
 ```
 
 Close log connection, and delete the log file name in global configuration.
@@ -37,10 +43,27 @@ closelog()
 We often need to analysis script running history, API error response, long-running task process, etc. A handful and simple functionality about reading log files in, cleaning and manipulating is very imporatant.
 ``` r
 readlog() # use default argument, and the log file name in global configuration
-# TODO more readlog type
+readlog(FALSE) # don't parse log content as json
+readlog(TRUE, 'today')
+
+readlog(.time = 'yesterday')
+readlog(.time = '2 days')
+readlog(.time = 'this minute')
+readlog(.time = 'this min')
+readlog(.time = '3 minutes')
+readlog(.time = '1 hour')
+readlog(.time = 'this hour')
+readlog(.time = '3 weeks')
+readlog(.time = 'this week')
+readlog(.time = 'this month')
+readlog(.time = 'this mon')
+readlog(.time = '2 months')
+readlog(.time = 'this year')
+readlog(.time = '2 years')
+
+readlog(log_name = 'log/log') # custom log files
+readlog(log_name = 'log/') # read all log files in log direcotry
 ```
 
 ## TODO
-- readlog with custom log file name, not in global configuration
 - print log to console while outputing to log file
-- more unit test

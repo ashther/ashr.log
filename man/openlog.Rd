@@ -11,7 +11,7 @@ openlog(log_name, log_level = INFO, rotate = c("size", "daily",
 \arguments{
 \item{log_name}{log file name}
 
-\item{log_level}{`ERROR`, `INFO` or `DEBUG`, constant in this package}
+\item{log_level}{`ERROR`, `WARN`, `INFO` or `DEBUG`, constant in this package}
 
 \item{rotate}{`size` or `daily`, the type of rotate log}
 
@@ -32,5 +32,10 @@ set log file name, if the file or directory doesn't exist, it will be created
 \examples{
 \dontrun{
 openlog('log/log')
+openlog('log/log', log_level = ERROR) # only check log when error happened
+openlog('log/log', rotate = 'daily')
+openlog('log/log', max_size = 3, units = 'Mb')
+openlog('log/log', backup_n = 10)
+openlog('log/log', as_json = FALSE)
 }
 }

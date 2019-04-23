@@ -1,21 +1,19 @@
 
 # rotate log function ----------------------------------------------------
-#' @title ratate log
-#'
-#' @description provide rotate log function
-#'
-#' @param ... the message output to log file
-#' @param .level the log message level
-#'
-#' @details each log file will be size of \code{max_size}
-#' at most, and with only \code{backou_n} log files in this log directory
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' rotatelog('this is a test message')
-#' }
+# @title ratate log
+#
+# @description provide rotate log function
+#
+# @param ... the message output to log file
+# @param .level the log message level
+#
+# @details each log file will be size of \code{max_size}
+# at most, and with only \code{backou_n} log files in this log directory
+#
+# @examples
+# \dontrun{
+# rotatelog('this is a test message')
+# }
 rotatelog <- function(..., .level = 0) {
 
   if (is.null(.config$log_name)) {

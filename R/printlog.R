@@ -1,5 +1,5 @@
 
-#' @title create diretory or/and file if log file path doesn't exits
+# create diretory or/and file if log file path doesn't exits
 createIfNotExist <- function() {
   # get dir name of log, create the dir and file it they dont exist
   log_name <- .config$log_name

@@ -8,7 +8,7 @@
 #'  and open file connection
 #'
 #' @param log_name log file name
-#' @param log_level `ERROR`, `INFO` or `DEBUG`, constant in this package
+#' @param log_level `ERROR`, `WARN`, `INFO` or `DEBUG`, constant in this package
 #' @param rotate `size` or `daily`, the type of rotate log
 #' @param max_size the max file size in bytes
 #' @param units the max size units, should be one of `Kb`, `b`, `Mb`, `Gb`, `Tb`, `Pb`
@@ -21,6 +21,11 @@
 #' @examples
 #' \dontrun{
 #' openlog('log/log')
+#' openlog('log/log', log_level = ERROR) # only check log when error happened
+#' openlog('log/log', rotate = 'daily')
+#' openlog('log/log', max_size = 3, units = 'Mb')
+#' openlog('log/log', backup_n = 10)
+#' openlog('log/log', as_json = FALSE)
 #' }
 openlog <- function(log_name, log_level = INFO,
                     rotate = c('size', 'daily', 'none'), max_size = 100, backup_n = 5L,
@@ -155,19 +160,19 @@ closelog <- function(verbose = TRUE) {
   warning('log file connection is not opened!', call. = FALSE)
 }
 
-#' @title set log file size
-#'
-#' @description if the log file size is larger than `max_sizes`, it will be rename like log.1,
-#' and the log message will be output to new log
-#'
-#' @param max_size the max file size in bytes
-#' @param units the max size units, should be one of `Kb`, `b`, `Mb`, `Gb`, `Tb`, `Pb`
-#' @param verbose if print success message
-#'
-#' @examples
-#' \dontrun{
-#' setMaxBytes(100*1024)
-#' }
+# @title set log file size
+#
+# @description if the log file size is larger than `max_sizes`, it will be rename like log.1,
+# and the log message will be output to new log
+#
+# @param max_size the max file size in bytes
+# @param units the max size units, should be one of `Kb`, `b`, `Mb`, `Gb`, `Tb`, `Pb`
+# @param verbose if print success message
+#
+# @examples
+# \dontrun{
+# setMaxBytes(100*1024)
+# }
 setMaxSize <- function(max_size, units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
                        verbose = TRUE) {
 

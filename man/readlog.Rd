@@ -4,13 +4,16 @@
 \alias{readlog}
 \title{read log files}
 \usage{
-readlog(as_json, .time = "today")
+readlog(as_json, .time = "today", log_name)
 }
 \arguments{
 \item{as_json}{if convert log column to multiple columns, it will use `as_json`
 in configuration if this is not provided}
 
 \item{.time}{the min timestamp in log files}
+
+\item{log_name}{log file name will be used if this argument is missing, otherwise
+`readlog` will read `log_name`, `log_name` can be either file or directory}
 }
 \value{
 log data frame
@@ -20,6 +23,26 @@ read log files, and convert to data frame
 }
 \examples{
 \dontrun{
-readlog('today', TRUE)
+readlog()
+readlog(FALSE)
+readlog(TRUE, 'today')
+
+readlog(.time = 'yesterday')
+readlog(.time = '2 days')
+readlog(.time = 'this minute')
+readlog(.time = 'this min')
+readlog(.time = '3 minutes')
+readlog(.time = '1 hour')
+readlog(.time = 'this hour')
+readlog(.time = '3 weeks')
+readlog(.time = 'this week')
+readlog(.time = 'this month')
+readlog(.time = 'this mon')
+readlog(.time = '2 months')
+readlog(.time = 'this year')
+readlog(.time = '2 years')
+
+readlog(log_name = 'log/log') # custom log files
+readlog(log_name = 'log/') # read all log files in log direcotry
 }
 }

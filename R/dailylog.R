@@ -1,20 +1,18 @@
 
-#' @title daily log
-#'
-#' @description provide daily log function
-#'
-#' @param ... the message output to log file
-#' @param .level the log message level
-#'
-#' @details expecpt the main log file, other log file will be named with its
-#' last modify day, like `log.2000-01-01`, and with only \code{backou_n} log files in this log directory
-#'
-#' @export
-#'
-#' @examples
-#' \dontrun{
-#' dailylog('this is a test message')
-#' }
+# @title daily log
+#
+# @description provide daily log function
+#
+# @param ... the message output to log file
+# @param .level the log message level
+#
+# @details expecpt the main log file, other log file will be named with its
+# last modify day, like `log.2000-01-01`, and with only \code{backou_n} log files in this log directory
+#
+# @examples
+# \dontrun{
+# dailylog('this is a test message')
+# }
 dailylog <- function(..., .level = 0) {
 
   log_name <- .config$log_name
