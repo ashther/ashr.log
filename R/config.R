@@ -32,11 +32,11 @@ openlog <- function(log_name, log_level = INFO,
                     units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
                     as_json = TRUE, verbose = FALSE) {
   rotate <- match.arg(rotate)
-  if (is.na(as.numeric(log_level))) stop('log_level must be numeric!')
+  if (is.na(as.numeric(log_level))) stop('log_level must be numeric!', call. = FALSE)
   as_json <- as.logical(as_json)
-  if (is.na(as_json)) stop('as_json must be logical!')
+  if (is.na(as_json)) stop('as_json must be logical!', call. = FALSE)
   verbose <- as.logical(verbose)
-  if (is.na(verbose)) stop('verbose must be logical!')
+  if (is.na(verbose)) stop('verbose must be logical!', call. = FALSE)
 
   if (length(log_name) > 1) {
     warning('multiple log files provided, use the frist one!', call. = FALSE)
@@ -53,7 +53,7 @@ openlog <- function(log_name, log_level = INFO,
 
   .config$log_level <- log_level
   .config$rotate <- rotate
-  setMaxSize(max_size, units, FALSE)
+  setMaxSize(max_size, units)
   .config$backup_n <- backup_n
   .config$as_json <- as_json
 
@@ -143,7 +143,7 @@ isOpenCon <- function() {
 #' \dontrun{
 #' closelog()
 #' }
-closelog <- function(verbose = TRUE) {
+closelog <- function(verbose = FALSE) {
   if (is.null(.config$log_name)) {
     warning("log file wasn't set already!", call. = FALSE)
     return(invisible())
@@ -173,8 +173,7 @@ closelog <- function(verbose = TRUE) {
 # \dontrun{
 # setMaxBytes(100*1024)
 # }
-setMaxSize <- function(max_size, units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
-                       verbose = TRUE) {
+setMaxSize <- function(max_size, units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb')) {
 
   units <- match.arg(units)
   max_size <- as.numeric(max_size)
@@ -192,11 +191,6 @@ setMaxSize <- function(max_size, units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
     Pb = 1024^5
   )
   .config$max_size <- max_size * units
-
-  if (verbose)
-    message(sprintf(
-      'the max size of log file was set to %s', getMaxSize()
-    ))
 
   invisible(TRUE)
 }

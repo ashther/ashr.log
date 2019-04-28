@@ -29,11 +29,13 @@ createIfNotExist <- function() {
   }
 
   ts <- paste0('[', as.character(Sys.time()), ']')
-  if (.config$as_json)
+  if (.config$as_json) {
     cat(ts, jsonlite::toJSON(list(...), auto_unbox = TRUE),
         '\n', file = .config$log_con, append = TRUE)
-  else
+  } else {
     cat(ts, ..., '\n', file = .config$log_con, append = TRUE)
+  }
+
 }
 
 #' @title cat message to log

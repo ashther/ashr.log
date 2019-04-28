@@ -88,11 +88,11 @@ fromJSONLog <- function(log_df) {
 #'
 #' @description read log files, and convert to data frame
 #'
+#' @param log_name log file name will be used if this argument is missing, otherwise
+#' `readlog` will read `log_name`, `log_name` can be either file or directory
 #' @param as_json if convert log column to multiple columns, it will use `as_json`
 #' in configuration if this is not provided
 #' @param .time the min timestamp in log files
-#' @param log_name log file name will be used if this argument is missing, otherwise
-#' `readlog` will read `log_name`, `log_name` can be either file or directory
 #'
 #' @return log data frame
 #' @export
@@ -123,7 +123,7 @@ fromJSONLog <- function(log_df) {
 #' readlog(log_name = 'log/log') # custom log files
 #' readlog(log_name = 'log/') # read all log files in log direcotry
 #' }
-readlog <- function(as_json, .time = 'today', log_name) {
+readlog <- function(log_name, as_json, .time = 'today') {
   stopifnot(is.character(.time))
   time_limit <- periodToTime(.time)
 
