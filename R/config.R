@@ -218,9 +218,9 @@ getMaxSize <- function() {
 #'
 #' @examples
 #' \dontrun{
-#' getLogInfo()
+#' getloginfo()
 #' }
-getLogInfo <- function() {
+getloginfo <- function() {
   res <- as.list(.config)
   modifyList(res, list(log_level = names(.config$log_level),
                        log_con = isOpenCon(),

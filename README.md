@@ -64,6 +64,3 @@ readlog(.time = '2 years')
 readlog(log_name = 'log/log') # custom log files
 readlog(log_name = 'log/') # read all log files in log direcotry
 ```
-
-## TODO
-- print log to console while outputing to log file

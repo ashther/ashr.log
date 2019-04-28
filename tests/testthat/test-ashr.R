@@ -4,7 +4,7 @@ test_that("setting and getting", {
 
   log_name <- file.path(tempdir(), 'log/log')
   openlog(log_name)
-  temp <- getLogInfo()
+  temp <- getloginfo()
   expect_equal(temp$log_name, log_name)
 
   expect_true(ashr.log:::isOpenCon())
@@ -17,7 +17,7 @@ test_that("setting and getting", {
 
   openlog(log_name, log_level = DEBUG, rotate = 'daily',
           max_size = 666, units = 'b', backup_n = 6, as_json = FALSE)
-  temp <- getLogInfo()
+  temp <- getloginfo()
   expect_equal(temp$backup_n, 6)
   expect_false(temp$as_json)
   expect_equal(temp$log_level, 'DEBUG')
