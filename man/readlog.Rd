@@ -4,16 +4,16 @@
 \alias{readlog}
 \title{read log files}
 \usage{
-readlog(as_json, .time = "today", log_name)
+readlog(log_name, as_json, .time = "today")
 }
 \arguments{
+\item{log_name}{log file name will be used if this argument is missing, otherwise
+`readlog` will read `log_name`, `log_name` can be either file or directory}
+
 \item{as_json}{if convert log column to multiple columns, it will use `as_json`
 in configuration if this is not provided}
 
 \item{.time}{the min timestamp in log files}
-
-\item{log_name}{log file name will be used if this argument is missing, otherwise
-`readlog` will read `log_name`, `log_name` can be either file or directory}
 }
 \value{
 log data frame

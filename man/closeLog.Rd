@@ -4,7 +4,7 @@
 \alias{closelog}
 \title{close log file connection}
 \usage{
-closelog(verbose = TRUE)
+closelog(verbose = FALSE)
 }
 \arguments{
 \item{verbose}{if print success message}
