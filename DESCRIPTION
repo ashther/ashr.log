@@ -1,7 +1,7 @@
 Package: ashr.log
 Type: Package
 Title: just utils for myself
-Version: 0.2.0
+Version: 0.2.1
 Author: ashther
 Maintainer: ashther <ashther@qq.com>
 Description: provides rotate log function.
