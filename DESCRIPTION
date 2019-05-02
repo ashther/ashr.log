@@ -14,4 +14,5 @@ BugReports: https://github.com/ashther/ashr.log/issues
 Suggests: 
     testthat,
     dplyr,
-    jsonlite
+    jsonlite,
+    covr
