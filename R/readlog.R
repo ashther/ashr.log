@@ -73,6 +73,10 @@ readSingleLog <- function(log_file) {
 fromJSONLog <- function(log_df) {
   log_temp <- lapply(log_df$log, function(x) {
     x <- jsonlite::fromJSON(x)
+    # TODO
+    # use this, maybe performance is issue
+    x <- lapply(x, function(y)if (is.null(y)) NA else y)
+    #
     # if log content is a array without names
     if (is.null(names(x)))
       return(dplyr::tibble(log = x))
