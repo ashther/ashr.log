@@ -56,7 +56,6 @@ periodToTime <- function(time_string) {
 }
 
 readSingleLog <- function(log_file) {
-  # TODO improve performance
   x <- readLines(log_file)
   x <- strsplit(
     x, '^\\[\\s*(?=\\d{4}-\\d{2}-\\d{2})|(?<=\\d{2}:\\d{2}:\\d{2})\\s*\\]\\s+',
@@ -66,24 +65,47 @@ readSingleLog <- function(log_file) {
   if (length(x) == 0)
     return(dplyr::tibble(timestamp = as.POSIXct(NA), log = character(0)))
 
-  do.call(rbind, lapply(x, function(y) {
-    dplyr::tibble(timestamp = as.POSIXct(y[2]), log = y[3])
-  }))
+  # do.call(rbind, lapply(x, function(y) {
+  #   dplyr::tibble(timestamp = as.POSIXct(y[2]), log = y[3])
+  # }))
+  x <- unlist(x)
+  id_timestamp <- seq(2, length(x), by = 3)
+  id_log <- id_timestamp + 1
+  dplyr::tibble(
+    timestamp = as.POSIXct(x[id_timestamp]),
+    log = x[id_log]
+  )
 }
 
+# fromJSONLog <- function(log_df) {
+#   log_temp <- lapply(log_df$log, function(x) {
+#     x <- jsonlite::fromJSON(x)
+#     # TODO
+#     # use this, maybe performance is issue
+#     x <- lapply(x, function(y)if (is.null(y)) NA else y)
+#     #
+#     # if log content is a array without names
+#     if (is.null(names(x)))
+#       return(dplyr::tibble(log = x))
+#     x
+#   })
+#   log_temp <- dplyr::bind_rows(log_temp)
+#   dplyr::as_tibble(
+#     cbind(log_df[, 'timestamp', drop = FALSE], log_temp)
+#   )
+# }
+
 fromJSONLog <- function(log_df) {
-  log_temp <- lapply(log_df$log, function(x) {
-    x <- jsonlite::fromJSON(x)
-    # TODO
-    # use this, maybe performance is issue
-    x <- lapply(x, function(y)if (is.null(y)) NA else y)
-    #
-    # if log content is a array without names
-    if (is.null(names(x)))
-      return(dplyr::tibble(log = x))
-    x
-  })
-  log_temp <- dplyr::bind_rows(log_temp)
+  log_temp <- paste0(log_df$log, collapse = ',')
+  log_temp <- paste0('[', log_temp, ']')
+  log_temp <- jsonlite::fromJSON(log_temp)
+  if (is.list(log_temp) & !is.data.frame(log_temp)) {
+    log_temp <- dplyr::bind_rows(lapply(log_temp, function(x) {
+      if (is.null(names(x)))
+        return(list(log = paste0(x, collapse = ' ')))
+      x
+    }))
+  }
   dplyr::as_tibble(
     cbind(log_df[, 'timestamp', drop = FALSE], log_temp)
   )
