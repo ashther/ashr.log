@@ -56,6 +56,7 @@ periodToTime <- function(time_string) {
 }
 
 readSingleLog <- function(log_file) {
+  # TODO improve performance
   x <- readLines(log_file)
   x <- strsplit(
     x, '^\\[\\s*(?=\\d{4}-\\d{2}-\\d{2})|(?<=\\d{2}:\\d{2}:\\d{2})\\s*\\]\\s+',
@@ -161,6 +162,8 @@ readlog <- function(log_name, as_json, .time = 'today') {
 
   log_files <- list.files(log_files_path, pattern = pattern, full.names = TRUE)
   log_files <- sort(log_files)
+  is_mix_logtype <- any(grepl('\\.\\d+$', basename(log_files))) &
+    any(grepl('\\.\\d{4}-\\d{2}-\\d{2}$', basename(log_files)))
 
   if (length(log_files) == 0) {
     warning('no log files to read!', call. = FALSE)
@@ -177,7 +180,9 @@ readlog <- function(log_name, as_json, .time = 'today') {
     res_temp <- readSingleLog(log_files[i])
     res <- rbind(res, res_temp)
 
-    if (i >= length(log_files) |
+    if (i >= length(log_files))
+      break()
+    if (!is_mix_logtype &
         (nrow(res_temp) > 0 & min(res$timestamp, na.rm = TRUE) < time_limit))
       break()
 
