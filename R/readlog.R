@@ -7,6 +7,9 @@ extractNumeric <- function(s, pattern, now, n) {
 }
 
 periodToTime <- function(time_string) {
+  if (time_string == 'all')
+    return(0)
+
   now <- Sys.time()
   day_1 <- 24*3600
 
@@ -65,9 +68,6 @@ readSingleLog <- function(log_file) {
   if (length(x) == 0)
     return(dplyr::tibble(timestamp = as.POSIXct(NA), log = character(0)))
 
-  # do.call(rbind, lapply(x, function(y) {
-  #   dplyr::tibble(timestamp = as.POSIXct(y[2]), log = y[3])
-  # }))
   x <- unlist(x)
   id_timestamp <- seq(2, length(x), by = 3)
   id_log <- id_timestamp + 1
@@ -77,25 +77,14 @@ readSingleLog <- function(log_file) {
   )
 }
 
-# fromJSONLog <- function(log_df) {
-#   log_temp <- lapply(log_df$log, function(x) {
-#     x <- jsonlite::fromJSON(x)
-#     # TODO
-#     # use this, maybe performance is issue
-#     x <- lapply(x, function(y)if (is.null(y)) NA else y)
-#     #
-#     # if log content is a array without names
-#     if (is.null(names(x)))
-#       return(dplyr::tibble(log = x))
-#     x
-#   })
-#   log_temp <- dplyr::bind_rows(log_temp)
-#   dplyr::as_tibble(
-#     cbind(log_df[, 'timestamp', drop = FALSE], log_temp)
-#   )
-# }
-
 fromJSONLog <- function(log_df) {
+  idx <- grepl('(\\}|\\])\\s*$', log_df$log, perl = TRUE) &
+    grepl('^\\s*(\\{|\\[)', log_df$log, perl = TRUE)
+  if (any(!idx)) {
+    log_df <- log_df[idx, ]
+    warning(sprintf('remove %s non-json', sum(!idx)), call. = FALSE)
+  }
+
   log_temp <- paste0(log_df$log, collapse = ',')
   log_temp <- paste0('[', log_temp, ']')
   log_temp <- jsonlite::fromJSON(log_temp)
@@ -117,9 +106,9 @@ fromJSONLog <- function(log_df) {
 #'
 #' @param log_name log file name will be used if this argument is missing, otherwise
 #' `readlog` will read `log_name`, `log_name` can be either file or directory
+#' @param .time the min timestamp in log files
 #' @param as_json if convert log column to multiple columns, it will use `as_json`
 #' in configuration if this is not provided
-#' @param .time the min timestamp in log files
 #'
 #' @return log data frame
 #' @export
@@ -128,9 +117,9 @@ fromJSONLog <- function(log_df) {
 #'
 #' @examples
 #' \dontrun{
-#' readlog()
-#' readlog(FALSE)
-#' readlog(TRUE, 'today')
+#' readlog() # use default argument, and the log file name in global configuration
+#' readlog(as_json = FALSE) # don't parse log content as json
+#' readlog(.time = 'today', as_json = TRUE)
 #'
 #' readlog(.time = 'yesterday')
 #' readlog(.time = '2 days')
@@ -150,7 +139,8 @@ fromJSONLog <- function(log_df) {
 #' readlog(log_name = 'log/log') # custom log files
 #' readlog(log_name = 'log/') # read all log files in log direcotry
 #' }
-readlog <- function(log_name, as_json, .time = 'today') {
+readlog <- function(log_name, .time = 'all', as_json) {
+
   stopifnot(is.character(.time))
   time_limit <- periodToTime(.time)
 
@@ -160,7 +150,7 @@ readlog <- function(log_name, as_json, .time = 'today') {
 
   # got all log files in the log directory, including rotate log and daily log
   if (missing(log_name))
-    log_name <- .config$log_name
+    log_name <- dirname(.config$log_name)
 
   if (is.null(log_name)) {
     warning('no log name to read!', call. = FALSE)
@@ -168,22 +158,12 @@ readlog <- function(log_name, as_json, .time = 'today') {
   }
 
   if (file_test('-d', log_name)) {
-    log_files_path <- log_name
-    pattern <- NULL
+    log_files <- list.files(log_name, full.names = TRUE)
+    log_files <- sort(log_files)
   } else {
-    log_files_path <- dirname(log_name)
-    pattern <- paste0(
-      # pattern match:
-      # 1. log
-      # 2. log.1
-      # 3. log.2000-01-01
-      '^', basename(log_name), c('$', '\\.\\d+$', '\\.\\d{4}-\\d{2}-\\d{2}$'),
-      collapse = '|'
-    )
+    log_files <- log_name
   }
 
-  log_files <- list.files(log_files_path, pattern = pattern, full.names = TRUE)
-  log_files <- sort(log_files)
   is_mix_logtype <- any(grepl('\\.\\d+$', basename(log_files))) &
     any(grepl('\\.\\d{4}-\\d{2}-\\d{2}$', basename(log_files)))
 

@@ -222,12 +222,16 @@ test_that('read log', {
   invisible(lapply(1:10, function(x) {
     printlog(y = paste0(1:10, collapse = ''))
   }))
+
+  temp <- readlog(file.path(dirname(log_name), 'log.1'), as_json = FALSE)
+  expect_equal(nrow(temp), 5)
+
   temp <- readlog(as_json = FALSE)
   expect_is(temp, 'tbl_df')
   expect_equal(colnames(temp), c('timestamp', 'log'))
   temp <- readlog()
   expect_is(temp, 'tbl_df')
-  expect_equal(colnames(temp), c('timestamp', 'y', 'x'))
+  expect_equal(colnames(temp), c('timestamp', 'msg', 'y', 'x'))
 
   closelog()
 
@@ -240,19 +244,19 @@ test_that('read log', {
 
   openlog(log_name)
   printlog('message without names')
-  temp <- readlog()
+  expect_warning({temp <- readlog()}, 'remove \\d+ non-json')
   expect_is(temp, 'tbl_df')
-  expect_equal(colnames(temp), c('timestamp', 'y', 'log', 'x'))
+  expect_equal(colnames(temp), c('timestamp', 'msg', 'y', 'log', 'x'))
 
   closelog()
 
-  temp <- readlog(log_name = log_name)
+  expect_warning({temp <- readlog(log_name = log_name)}, 'remove \\d+ non-json')
   expect_is(temp, 'tbl_df')
-  expect_equal(colnames(temp), c('timestamp', 'y', 'log', 'x'))
+  expect_equal(colnames(temp), c('timestamp', 'msg', 'y', 'log'))
 
-  temp <- readlog(log_name = dirname(log_name))
+  expect_warning({temp <- readlog(log_name = dirname(log_name))}, 'remove \\d+ non-json')
   expect_is(temp, 'tbl_df')
-  expect_equal(colnames(temp), c('timestamp', 'y', 'log', 'x'))
+  expect_equal(colnames(temp), c('timestamp', 'msg', 'y', 'log', 'x'))
 
   unlink(dirname(log_name), TRUE)
 })
