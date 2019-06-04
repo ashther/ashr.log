@@ -224,7 +224,8 @@ test_that('read log', {
   }))
 
   temp <- readlog(file.path(dirname(log_name), 'log.1'), as_json = FALSE)
-  expect_equal(nrow(temp), 5)
+  temp_all <- readlog(dirname(log_name), as_json = FALSE)
+  expect_lt(nrow(temp), nrow(temp_all))
 
   temp <- readlog(as_json = FALSE)
   expect_is(temp, 'tbl_df')
