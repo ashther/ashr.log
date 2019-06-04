@@ -43,8 +43,8 @@ closelog()
 We often need to analysis script running history, API error response, long-running task process, etc. A handful and simple functionality about reading log files in, cleaning and manipulating is very imporatant.
 ``` r
 readlog() # use default argument, and the log file name in global configuration
-readlog(FALSE) # don't parse log content as json
-readlog(TRUE, 'today')
+readlog(as_json = FALSE) # don't parse log content as json
+readlog(.time = 'today', as_json = TRUE)
 
 readlog(.time = 'yesterday')
 readlog(.time = '2 days')
