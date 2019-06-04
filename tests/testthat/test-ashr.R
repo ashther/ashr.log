@@ -58,7 +58,7 @@ test_that('log level', {
     `[[`, 2
   )
   temp <- trimws(temp)
-  expect_equal(temp, c('this is info message', 'this is error message'))
+  expect_equal(temp, c('open log', 'this is info message', 'this is error message'))
 
   closelog()
   unlink(dirname(log_name), TRUE)
@@ -75,7 +75,7 @@ test_that('log level', {
     `[[`, 2
   )
   temp <- trimws(temp)
-  expect_equal(temp, 'this is error message')
+  expect_equal(temp, c('open log', 'this is error message'))
 
   closelog()
   unlink(dirname(log_name), TRUE)
@@ -92,7 +92,7 @@ test_that('log level', {
     `[[`, 2
   )
   temp <- trimws(temp)
-  expect_equal(temp, c('this is info message', 'this is error message',
+  expect_equal(temp, c('open log', 'this is info message', 'this is error message',
                        'this is debug message'))
 
   closelog()
@@ -106,7 +106,7 @@ test_that('print to log file', {
   openlog(log_name, as_json = FALSE, rotate = 'none')
   printlog('this is a test plain message')
   temp <- readLines(log_name)
-  temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[1]][2]
+  temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[2]][2]
   temp <- trimws(temp)
   expect_equal(temp, 'this is a test plain message')
 
@@ -116,12 +116,12 @@ test_that('print to log file', {
   openlog(log_name, as_json = TRUE, rotate = 'none')
   printlog('this is a array message')
   temp <- readLines(log_name)
-  temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[1]][2]
+  temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[2]][2]
   temp <- trimws(temp)
   expect_equal(temp, "[\"this is a array message\"]")
 
   printlog(msg = 'this is a test message')
-  temp <- readLines(log_name)[2]
+  temp <- readLines(log_name)[3]
   temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[1]][2]
   temp <- trimws(temp)
   expect_equal(temp, "{\"msg\":\"this is a test message\"}")
@@ -175,7 +175,7 @@ test_that('daily log', {
 
   printlog(msg_test)
   temp <- readLines(log_name)
-  temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[1]][2]
+  temp <- strsplit(temp, '(?<=\\d{2}:\\d{2}:\\d{2})\\](?=\\s)', perl = TRUE)[[2]][2]
   temp <- trimws(temp)
   expect_equal(temp, msg_test)
 

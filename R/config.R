@@ -64,6 +64,10 @@ openlog <- function(log_name, log_level = INFO,
       getMaxSize(), .config$backup_n, .config$as_json
     ))
 
+  # add open information in the beginning of log
+  # to avoid recursive, use .printlog directly instead of printlog
+  .printlog(msg = 'open log', .level = -Inf)
+
   invisible(TRUE)
 }
 
@@ -150,6 +154,11 @@ closelog <- function(verbose = FALSE) {
   }
 
   if (isOpenCon()) {
+
+    # add close information at the end of log
+    # to avoid recursive, use .printlog directly instead of printlog
+    .printlog(msg = 'close log', .level = -Inf)
+
     close(.config$log_con)
     .config$log_name <- NULL
     if (verbose)
