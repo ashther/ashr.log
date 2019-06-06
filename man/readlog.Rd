@@ -23,8 +23,8 @@ read log files, and convert to data frame
 }
 \examples{
 \dontrun{
-readlog()
-readlog(as_json = FALSE)
+readlog() # use default argument, and the log file name in global configuration
+readlog(as_json = FALSE) # don't parse log content as json
 readlog(.time = 'today', as_json = TRUE)
 
 readlog(.time = 'yesterday')

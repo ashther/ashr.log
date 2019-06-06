@@ -159,7 +159,8 @@ readlog <- function(log_name, .time = 'all', as_json) {
 
   if (file_test('-d', log_name)) {
     log_files <- list.files(log_name, full.names = TRUE)
-    log_files <- sort(log_files)
+    ord <- order(file.info(log_files)$mtime, decreasing = TRUE)
+    log_files <- log_files[ord]
   } else {
     log_files <- log_name
   }
