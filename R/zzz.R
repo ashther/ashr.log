@@ -5,6 +5,7 @@
   .config$log_level <- INFO
   .config$rotate <- 'size'
   .config$as_json <- TRUE
+  .config$is_print <- FALSE
 }
 
 .onAttach <- function(libname, pkgname) {

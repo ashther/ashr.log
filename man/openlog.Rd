@@ -6,7 +6,8 @@
 \usage{
 openlog(log_name, log_level = INFO, rotate = c("size", "daily",
   "none"), max_size = 100, backup_n = 5L, units = c("Kb", "b", "Mb",
-  "Gb", "Tb", "Pb"), as_json = TRUE, verbose = FALSE)
+  "Gb", "Tb", "Pb"), as_json = TRUE, is_print = FALSE,
+  verbose = FALSE)
 }
 \arguments{
 \item{log_name}{log file name}
@@ -22,6 +23,8 @@ openlog(log_name, log_level = INFO, rotate = c("size", "daily",
 \item{units}{the max size units, should be one of `Kb`, `b`, `Mb`, `Gb`, `Tb`, `Pb`}
 
 \item{as_json}{if all log input will be convert to json, default is true}
+
+\item{is_print}{if print log content to console}
 
 \item{verbose}{if print success message}
 }

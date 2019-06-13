@@ -14,6 +14,7 @@
 #' @param units the max size units, should be one of `Kb`, `b`, `Mb`, `Gb`, `Tb`, `Pb`
 #' @param backup_n the backup log files number, must be non-negative
 #' @param as_json if all log input will be convert to json, default is true
+#' @param is_print if print log content to console
 #' @param verbose if print success message
 #'
 #' @export
@@ -30,11 +31,13 @@
 openlog <- function(log_name, log_level = INFO,
                     rotate = c('size', 'daily', 'none'), max_size = 100, backup_n = 5L,
                     units = c('Kb', 'b', 'Mb', 'Gb', 'Tb', 'Pb'),
-                    as_json = TRUE, verbose = FALSE) {
+                    as_json = TRUE, is_print = FALSE, verbose = FALSE) {
   rotate <- match.arg(rotate)
   if (is.na(as.numeric(log_level))) stop('log_level must be numeric!', call. = FALSE)
   as_json <- as.logical(as_json)
   if (is.na(as_json)) stop('as_json must be logical!', call. = FALSE)
+  is_print <- as.logical(is_print)
+  if (is.na(is_print)) stop('is_print must be logical!', call. = FALSE)
   verbose <- as.logical(verbose)
   if (is.na(verbose)) stop('verbose must be logical!', call. = FALSE)
 
@@ -56,12 +59,13 @@ openlog <- function(log_name, log_level = INFO,
   setMaxSize(max_size, units)
   .config$backup_n <- backup_n
   .config$as_json <- as_json
+  .config$is_print <- is_print
 
   if (verbose)
     message(sprintf(
-      'log file was set to %s, \nlog level is %s, \nrotate type is %s, \nmax size is %s, \nbackup number is %s, \nconvert input to json is %s',
+      'log file was set to %s, \nlog level is %s, \nrotate type is %s, \nmax size is %s, \nbackup number is %s, \nconvert input to json is %s, \nprint to console is %s',
       .config$log_name, names(.config$log_level), .config$rotate,
-      getMaxSize(), .config$backup_n, .config$as_json
+      getMaxSize(), .config$backup_n, .config$as_json, .config$is_print
     ))
 
   # add open information in the beginning of log
@@ -94,6 +98,7 @@ reopenlog <- function(.l) {
   params <- appendVal(list(rotate = 'size'), params, .l)
   params <- appendVal(list(backup_n = 5), params, .l)
   params <- appendVal(list(as_json = TRUE), params, .l)
+  params <- appendVal(list(is_print = FALSE), params, .l)
   params <- append(params, list(verbose = FALSE))
 
   if (!'log_level' %in% names(.l)) {

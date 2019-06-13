@@ -15,14 +15,18 @@ test_that("setting and getting", {
   closelog()
   unlink(dirname(log_name), TRUE)
 
-  openlog(log_name, log_level = DEBUG, rotate = 'daily',
-          max_size = 666, units = 'b', backup_n = 6, as_json = FALSE)
+  expect_output(
+    openlog(log_name, log_level = DEBUG, rotate = 'daily', max_size = 666,
+            units = 'b', backup_n = 6, as_json = FALSE, is_print = TRUE),
+    regexp = 'open log'
+  )
   temp <- getloginfo()
   expect_equal(temp$backup_n, 6)
   expect_false(temp$as_json)
   expect_equal(temp$log_level, 'DEBUG')
   expect_equal(temp$max_size, '666 bytes')
   expect_equal(temp$rotate, 'daily')
+  expect_equal(temp$is_print, TRUE)
 
   setMaxSize(1, units = 'Kb')
   expect_equal(getMaxSize(), '1 Kb')
@@ -39,7 +43,9 @@ test_that("setting and getting", {
   setMaxSize(1, units = 'Mb')
   expect_equal(getMaxSize(), '1 Mb')
 
-  closelog()
+  openlog(log_name, is_print = TRUE)
+  expect_output(closelog(), 'close log')
+
   unlink(dirname(log_name), TRUE)
 })
 
@@ -135,7 +141,8 @@ test_that('rotate log', {
 
   log_name <- file.path(tempdir(), 'log/log')
 
-  openlog(log_name, rotate = 'size', max_size = 1, units = 'Kb', backup_n = 3, as_json = FALSE)
+  openlog(log_name, rotate = 'size', max_size = 1, units = 'Kb', backup_n = 3,
+          as_json = FALSE, is_print = TRUE)
   # setMaxSize(1, units = 'Kb')
   # setBackupN(3)
   printlog(paste(rep(letters, 10), collapse = ''))
@@ -162,6 +169,8 @@ test_that('rotate log', {
   temp <- list.files(dirname(log_name))
   expect_equal(length(temp), 4)
   expect_equal(temp, c('log', 'log.1', 'log.2', 'log.3'))
+
+  expect_output(printlog(msg = 'output ok'), 'output ok')
 
   closelog()
   unlink(dirname(log_name), TRUE)

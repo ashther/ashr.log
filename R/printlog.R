@@ -30,10 +30,17 @@ createIfNotExist <- function() {
 
   ts <- paste0('[', as.character(Sys.time()), ']')
   if (.config$as_json) {
-    cat(ts, jsonlite::toJSON(list(...), auto_unbox = TRUE),
-        '\n', file = .config$log_con, append = TRUE)
+    to_log <- jsonlite::toJSON(list(...), auto_unbox = TRUE)
+    cat(ts, to_log, '\n', file = .config$log_con, append = TRUE)
+
+    if (.config$is_print)
+      cat(ts, to_log, '\n')
+
   } else {
     cat(ts, ..., '\n', file = .config$log_con, append = TRUE)
+
+    if (.config$is_print)
+      cat(ts, ..., '\n')
   }
 
 }
