@@ -25,6 +25,7 @@ openlog('log/log', rotate = 'daily') # save log daily
 openlog('log/log', max_size = 3, units = 'Mb') # a litter bigger log file
 openlog('log/log', backup_n = 10)
 openlog('log/log', as_json = FALSE)
+openlog('log/log', is_print = TRUE)
 ```
 
 Print the log content to log file, with the rotate type(or not) which is in global configuration.

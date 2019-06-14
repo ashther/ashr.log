@@ -27,6 +27,7 @@
 #' openlog('log/log', max_size = 3, units = 'Mb')
 #' openlog('log/log', backup_n = 10)
 #' openlog('log/log', as_json = FALSE)
+#' openlog('log/log', is_print = TRUE)
 #' }
 openlog <- function(log_name, log_level = INFO,
                     rotate = c('size', 'daily', 'none'), max_size = 100, backup_n = 5L,

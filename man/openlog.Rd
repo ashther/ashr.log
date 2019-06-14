@@ -40,5 +40,6 @@ openlog('log/log', rotate = 'daily')
 openlog('log/log', max_size = 3, units = 'Mb')
 openlog('log/log', backup_n = 10)
 openlog('log/log', as_json = FALSE)
+openlog('log/log', is_print = TRUE)
 }
 }
