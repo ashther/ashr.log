@@ -41,7 +41,7 @@ Close log connection, and delete the log file name in global configuration.
 closelog()
 ```
 
-We often need to analysis script running history, API error response, long-running task process, etc. A handful and simple functionality about reading log files in, cleaning and manipulating is very imporatant.
+We often need to analysis script running history, API error response, long-running task process, etc. A handful and simple functionality about reading log files in, cleaning and manipulating is very imporatant
 ``` r
 readlog() # use default argument, and the log file name in global configuration
 readlog(as_json = FALSE) # don't parse log content as json
