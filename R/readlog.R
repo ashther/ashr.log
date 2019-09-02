@@ -60,6 +60,9 @@ periodToTime <- function(time_string) {
 
 readSingleLog <- function(log_file) {
   x <- readLines(log_file)
+  if (Sys.info()['sysname'] == 'Windows') {
+    x <- iconv(x, 'utf-8', 'gbk')
+  }
   x <- strsplit(
     x, '^\\[\\s*(?=\\d{4}-\\d{2}-\\d{2})|(?<=\\d{2}:\\d{2}:\\d{2})\\s*\\]\\s+',
     perl = TRUE
