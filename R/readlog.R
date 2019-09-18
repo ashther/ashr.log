@@ -61,7 +61,20 @@ periodToTime <- function(time_string) {
 readSingleLog <- function(log_file) {
   x <- readLines(log_file)
   if (Sys.info()['sysname'] == 'Windows') {
-    x <- iconv(x, 'utf-8', 'gbk')
+    temp <- iconv(x, 'utf-8', 'gbk')
+    if (all(!is.na(temp))) {
+      x <- temp
+    } else {
+      x_na <- x[is.na(temp)]
+      if (length(x_na) > 3) {
+        x_na <- c(x_na[c(1:3)], '...')
+      }
+      warning(
+        'there may be encoding issue, following log can\'t be iconv\n',
+        sprintf("%s\n", x_na),
+        call. = FALSE
+      )
+    }
   }
 
   x <- strsplit(
