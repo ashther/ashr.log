@@ -1,5 +1,5 @@
 # ashr.log
-[![Travis build status](https://travis-ci.org/ashther/ashr.log.svg?branch=master)](https://travis-ci.org/ashther/ashr.log)
+[![R build status](https://github.com/ashther/ashr.log/workflows/R-CMD-check/badge.svg)](https://github.com/ashther/ashr.log/actions)
 [![Coverage status](https://codecov.io/gh/ashther/ashr.log/branch/master/graph/badge.svg)](https://codecov.io/github/ashther/ashr.log?branch=master)
 [![lifecycle](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 
