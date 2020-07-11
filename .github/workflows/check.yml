@@ -22,5 +22,6 @@ jobs:
       - name: Check
         run: rcmdcheck::rcmdcheck(args = "--no-manual", error_on = "error")
         shell: Rscript {0}
-      - name test coverage
+      - name: test coverage
         run: covr::codecov()
+        shell: Rscript {0}
